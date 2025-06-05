@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Header from './Components/Layout/Header/Header'
-import BottomNavigation from './Components/Layout/BottemNavigation/BottemNavigation'
+import MainLayout from './Components/Layout/MainLayout/MainLayout'
 import HomePage from './Components/Pages/HomePage/HomePage'
 import EventsPage from './Components/Pages/EventsPage/EventsPage'
 import ResourcesPage from './Components/Pages/ResourcesPage/ResourcesPage'
@@ -56,40 +55,39 @@ const App = () => {
 
   return (
     <Router>
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
-        <Header sosRequests={sosRequests} />
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" />} />
 
-        <div className="p-4 pb-20">
-          <Routes>
-            <Route path="/" element={<Navigate to="/home" />} />
-            <Route path="/home" element={<HomePage events={events} sosRequests={sosRequests} />} />
-            <Route path="/events" element={
-              <EventsPage 
-                events={events}
-                showNewEvent={showNewEvent}
-                setShowNewEvent={setShowNewEvent}
-                newEvent={newEvent}
-                setNewEvent={setNewEvent}
-                handleCreateEvent={handleCreateEvent}
-              />
-            } />
-            <Route path="/resources" element={
-              <ResourcesPage 
+        {/* Layout Route with shared Header & BottomNavigation */}
+        <Route 
+          element={<MainLayout sosRequests={sosRequests} />}
+        >
+          <Route path="/home" element={<HomePage events={events} sosRequests={sosRequests} />} />
+          <Route path="/events" element={
+            <EventsPage 
+              events={events}
+              showNewEvent={showNewEvent}
+              setShowNewEvent={setShowNewEvent}
+              newEvent={newEvent}
+              setNewEvent={setNewEvent}
+              handleCreateEvent={handleCreateEvent}
+            />
+          } />
+          <Route path="/resources" element={
+            <ResourcesPage 
               resources={resources}
               showSOS={showSOS}
               setShowSOS={setShowSOS}
               handleSendSOS={handleSendSOS}
             />
-            } />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/volunteers" element={<VolunteersPage events={events} />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="*" element={<Navigate to="/home" />} />
-          </Routes>
-        </div>
+          } />
+          <Route path="/support" element={<SupportPage />} />
+          <Route path="/volunteers" element={<VolunteersPage events={events} />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
 
-        <BottomNavigation />
-      </div>
+        <Route path="*" element={<Navigate to="/home" />} />
+      </Routes>
     </Router>
   )
 }

@@ -1,43 +1,44 @@
 import { NavLink } from 'react-router-dom'
 import { Home, Calendar, Heart, Users, BookOpen, User } from 'lucide-react'
+import './BottemNavigation.css'
 
 const BottomNavigation = () => (
-  <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t max-w-md mx-auto flex justify-around py-2 z-50">
+  <nav className='bottom-nav'>
     <NavLink 
       to="/home" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Home size={24} />
+      <Home size={40} />
     </NavLink>
     <NavLink 
       to="/events" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Calendar size={24} />
+      <Calendar size={40} />
     </NavLink>
     <NavLink 
       to="/support" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Heart size={24} />
+      <Heart size={40} />
     </NavLink>
     <NavLink 
       to="/volunteers" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Users size={24} />
+      <Users size={40} />
     </NavLink>
     <NavLink 
       to="/resources" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <BookOpen size={24} />
+      <BookOpen size={40} />
     </NavLink>
     <NavLink 
       to="/profile" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <User size={24} />
+      <User size={40} />
     </NavLink>
   </nav>
 )

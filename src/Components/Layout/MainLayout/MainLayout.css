@@ -1,0 +1,23 @@
+.main-content {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+  
+  /* Add media query for smaller screens */
+  @media (max-width: 640px) {
+    .main-content {
+      padding-top: 4rem; /* slightly smaller padding on mobile */
+      padding-bottom: 4rem;
+    }
+  }
+  
+  .page-container {
+    padding-bottom: 4.5rem;
+  }
+  
+  @media (max-width: 640px) {
+    .page-container {
+      padding-bottom: 4rem;
+    }
+  }
+  
