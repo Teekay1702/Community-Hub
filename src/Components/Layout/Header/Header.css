@@ -1,0 +1,46 @@
+.header {
+    background: linear-gradient(to right, #f97316, #dc2626); /* from-orange-500 to-red-600 */
+    color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-title {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .notification {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .notification-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .notification-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #fca5a5; /* red-300 */
+    border-radius: 9999px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.3);
+      opacity: 0.4;
+    }
+  }
+  
