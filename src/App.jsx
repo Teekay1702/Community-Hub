@@ -11,7 +11,7 @@ import { fetchEvents, addEvent, updateEvent } from './Components/Data/firebaseEv
 
 const App = () => {
   const [events, setEvents] = useState([])
-  const [resources] = useState([])
+  const [resources, setResources] = useState([])
   const [sosRequests, setSosRequests] = useState([])
   const [showNewEvent, setShowNewEvent] = useState(false)
   const [showSOS, setShowSOS] = useState(false)
@@ -95,6 +95,7 @@ const App = () => {
           <Route path="/resources" element={
             <ResourcesPage
               resources={resources}
+              setResources={setResources}
               showSOS={showSOS}
               setShowSOS={setShowSOS}
               handleSendSOS={handleSendSOS}
