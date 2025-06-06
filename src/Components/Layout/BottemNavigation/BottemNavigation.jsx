@@ -8,37 +8,37 @@ const BottomNavigation = () => (
       to="/home" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Home size={40} />
+      <Home size={35} />
     </NavLink>
     <NavLink 
       to="/events" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Calendar size={40} />
+      <Calendar size={35} />
     </NavLink>
     <NavLink 
       to="/support" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Heart size={40} />
+      <Heart size={35} />
     </NavLink>
     <NavLink 
       to="/volunteers" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <Users size={40} />
+      <Users size={35} />
     </NavLink>
     <NavLink 
       to="/resources" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <BookOpen size={40} />
+      <BookOpen size={35} />
     </NavLink>
     <NavLink 
       to="/profile" 
       className={({ isActive }) => `nav-link ${isActive ? 'text-orange-500' : ''}`}
     >
-      <User size={40} />
+      <User size={35} />
     </NavLink>
   </nav>
 )

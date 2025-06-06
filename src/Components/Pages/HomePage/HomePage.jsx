@@ -1,6 +1,5 @@
 import { Heart, Shirt, Shield, BookOpen, AlertTriangle } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
-import React from 'react';
 import SOSCard from '../../Cards/SOSCard/SOSCard';
 import './HomePage.css';
 
@@ -50,9 +49,13 @@ const HomePage = ({ events, sosRequests }) => (
 
     <div className="events-section">
       <h2 className="events-heading">Ubuntu Spirit in Action</h2>
-      {events.slice(0, 2).map(event => (
-        <EventCard key={event.id} event={event} />
-      ))}
+      {events
+        .slice() // to avoid mutating original
+        .sort((a, b) => new Date(b.date) - new Date(a.date)) // sort by most recent
+        .slice(0, 3) // take top 3
+        .map(event => (
+          <EventCard key={event.id} event={event} />
+        ))}
     </div>
   </div>
 );
