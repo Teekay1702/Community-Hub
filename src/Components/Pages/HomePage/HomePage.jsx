@@ -45,7 +45,7 @@ const HomePage = ({ events, sosRequests }) => (
       </div>
       <div className="service-card">
         <Shield className="service-icon pink" />
-        <h3 className="service-title">Pads Emergency</h3>
+        <h3 className="service-title">Emergency requests</h3>
         <p className="service-description">24/7 SOS support</p>
       </div>
       <div className="service-card">
