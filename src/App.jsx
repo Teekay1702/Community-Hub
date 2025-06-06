@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './Components/Layout/MainLayout/MainLayout'
 import HomePage from './Components/Pages/HomePage/HomePage'
@@ -7,40 +7,59 @@ import ResourcesPage from './Components/Pages/ResourcesPage/ResourcesPage'
 import SupportPage from './Components/Pages/SupportPage/SupportPage'
 import VolunteersPage from './Components/Pages/VolunteersPage/Volunteers'
 import ProfilePage from './Components/Pages/ProfilePage/ProfilePage'
-import { initialEvents, initialResources, initialSosRequests } from './Components/Data/initialData'
+import { fetchEvents, addEvent, updateEvent } from './Components/Data/firebaseEvents'
 
 const App = () => {
-  const [events, setEvents] = useState(initialEvents)
-  const [resources] = useState(initialResources)
-  const [sosRequests, setSosRequests] = useState(initialSosRequests)
+  const [events, setEvents] = useState([])
+  const [resources] = useState([])
+  const [sosRequests, setSosRequests] = useState([])
   const [showNewEvent, setShowNewEvent] = useState(false)
   const [showSOS, setShowSOS] = useState(false)
-  const [newEvent, setNewEvent] = useState({ 
-    title: '', 
-    location: '', 
-    date: '', 
-    volunteers: 0, 
-    category: 'soup-kitchen' 
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    location: '',
+    date: '',
+    volunteers: 0,
+    category: 'soup-kitchen'
   })
 
-  const handleCreateEvent = () => {
-    if (newEvent.title && newEvent.location && newEvent.date) {
-      setEvents([...events, { 
-        id: events.length + 1, 
-        ...newEvent, 
-        volunteers: 0, 
-        needed: parseInt(newEvent.volunteers) || 10 
-      }])
+  useEffect(() => {
+    const loadEvents = async () => {
+      const data = await fetchEvents()
+      setEvents(data)
+    }
+    loadEvents()
+  }, [])
+
+
+  const handleCreateEvent = async () => {
+  if (newEvent.title && newEvent.location && newEvent.date) {
+    try {
+      if (newEvent.id) {
+        const { id, ...eventData } = newEvent;
+        await updateEvent(id, eventData);
+      } else {
+        await addEvent(newEvent);
+      }
+
+      const updatedEvents = await fetchEvents();
+      setEvents(updatedEvents);
+
       setNewEvent({ 
         title: '', 
         location: '', 
         date: '', 
         volunteers: 0, 
         category: 'soup-kitchen' 
-      })
-      setShowNewEvent(false)
+      });
+      setShowNewEvent(false);
+    } catch (error) {
+      console.error('Failed to create/update event:', error);
+      alert('Error saving event');
     }
   }
+}
+
 
   const handleSendSOS = (sosData) => {
     const newSOS = {
@@ -59,12 +78,12 @@ const App = () => {
         <Route path="/" element={<Navigate to="/home" />} />
 
         {/* Layout Route with shared Header & BottomNavigation */}
-        <Route 
+        <Route
           element={<MainLayout sosRequests={sosRequests} />}
         >
           <Route path="/home" element={<HomePage events={events} sosRequests={sosRequests} />} />
           <Route path="/events" element={
-            <EventsPage 
+            <EventsPage
               events={events}
               showNewEvent={showNewEvent}
               setShowNewEvent={setShowNewEvent}
@@ -74,7 +93,7 @@ const App = () => {
             />
           } />
           <Route path="/resources" element={
-            <ResourcesPage 
+            <ResourcesPage
               resources={resources}
               showSOS={showSOS}
               setShowSOS={setShowSOS}

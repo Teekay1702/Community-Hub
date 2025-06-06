@@ -1,92 +1,158 @@
+import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
+import { fetchEvents, addEvent, deleteEvent, updateEvent } from '../../Data/firebaseEvents';
 import './Events.css';
 
-const EventsPage = ({ 
-  events, 
-  showNewEvent, 
-  setShowNewEvent, 
-  newEvent, 
-  setNewEvent, 
-  handleCreateEvent 
-}) => (
-  <div className="events-page">
-    <div className="events-header">
-      <h1 className="events-title">Community Events</h1>
-      <button 
-        onClick={() => setShowNewEvent(true)}
-        className="add-button"
-      >
-        <Plus className="plus-icon" />
-      </button>
-    </div>
+const EventsPage = () => {
+  const [events, setEvents] = useState([]);
+  const [showNewEvent, setShowNewEvent] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    category: ' ',  // default value matches one of the select options
+    location: '',
+    date: '',
+    volunteers: ''
+  });
 
-    {showNewEvent && (
-      <div className="event-form">
-        <h3 className="form-title">Create Ubuntu Event</h3>
-        <div className="form-fields">
-          <input
-            type="text"
-            placeholder="Event Title"
-            value={newEvent.title}
-            onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-            className="form-input"
-          />
-          <select
-            value={newEvent.category}
-            onChange={(e) => setNewEvent({...newEvent, category: e.target.value})}
-            className="form-input"
-          >
-            <option value="soup-kitchen">Community Soup Kitchen</option>
-            <option value="clothing">Clothing Drive</option>
-            <option value="uniforms">School Uniforms</option>
-            <option value="pads">Pads Drive</option>
-            <option value="food">Food Sharing</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Safe Location"
-            value={newEvent.location}
-            onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
-            className="form-input"
-          />
-          <input
-            type="date"
-            value={newEvent.date}
-            onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
-            className="form-input"
-          />
-          <input
-            type="number"
-            placeholder="Volunteers Needed"
-            value={newEvent.volunteers}
-            onChange={(e) => setNewEvent({...newEvent, volunteers: e.target.value})}
-            className="form-input"
-          />
-          <div className="form-actions">
-            <button 
-              onClick={handleCreateEvent}
-              className="submit-button"
+
+  // Fetch all events on load
+  useEffect(() => {
+    const loadEvents = async () => {
+      const data = await fetchEvents();
+      setEvents(data);
+    };
+    loadEvents();
+  }, []);
+
+  // Handle create button click
+  const handleCreateEvent = async () => {
+  try {
+    if (!newEvent.title || !newEvent.location || !newEvent.date) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    if (newEvent.id) {
+      // Updating an existing event
+      const { id, ...eventData } = newEvent;
+      await updateEvent(id, eventData);
+    } else {
+      // Creating a new event
+      await addEvent(newEvent);
+    }
+
+    setNewEvent({
+      title: '',
+      category: '',
+      location: '',
+      date: '',
+      volunteers: ''
+    });
+    setShowNewEvent(false);
+
+    const updatedEvents = await fetchEvents();
+    setEvents(updatedEvents);
+  } catch (error) {
+    console.error('Failed to create/update event:', error);
+    alert('Failed to create or update event. Please try again.');
+  }
+};
+
+
+  const handleEdit = (event) => {
+  setNewEvent(event);           // Load the clicked event into the form
+  setShowNewEvent(true);        // Show the form for editing
+};
+
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteEvent(id);
+      // remove from local state after deletion
+      setEvents(prevEvents => prevEvents.filter(e => e.id !== id));
+    } catch (error) {
+      console.error('Failed to delete:', error);
+    }
+  };
+
+
+  return (
+    <div className="events-page">
+      <div className="events-header">
+        <h1 className="events-title">Community Events</h1>
+        <button onClick={() => setShowNewEvent(true)} className="add-button">
+          <Plus className="plus-icon" />
+        </button>
+      </div>
+
+      {showNewEvent && (
+        <div className="event-form">
+          <h3 className="form-title">Create Ubuntu Event</h3>
+          <div className="form-fields">
+            <input
+              type="text"
+              placeholder="Event Title"
+              value={newEvent.title}
+              onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+              className="form-input"
+            />
+            <select
+              value={newEvent.category}
+              onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+              className="form-input"
             >
-              Create Event
-            </button>
-            <button 
-              onClick={() => setShowNewEvent(false)}
-              className="cancel-button"
-            >
-              Cancel
-            </button>
+              <option value="soup-kitchen">Community Soup Kitchen</option>
+              <option value="clothing">Clothing Drive</option>
+              <option value="uniforms">School Uniforms</option>
+              <option value="pads">Pads Drive</option>
+              <option value="food">Food Sharing</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Safe Location"
+              value={newEvent.location}
+              onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+              className="form-input"
+            />
+            <input
+              type="date"
+              value={newEvent.date}
+              onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+              className="form-input"
+            />
+            <input
+              type="number"
+              placeholder="Volunteers Needed"
+              value={newEvent.volunteers}
+              onChange={(e) => setNewEvent({ ...newEvent, volunteers: parseInt(e.target.value) || 0 })}
+              className="form-input"
+            />
+            <div className="form-actions">
+              <button onClick={handleCreateEvent} className="submit-button">
+                Create Event
+              </button>
+              <button onClick={() => setShowNewEvent(false)} className="cancel-button">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
-    <div className="events-list">
-      {events.map(event => (
-        <EventCard key={event.id} event={event} />
-      ))}
+      <div className="events-list">
+        {events.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default EventsPage;
