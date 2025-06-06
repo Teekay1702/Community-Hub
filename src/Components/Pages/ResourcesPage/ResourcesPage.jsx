@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ResourceCard from '../../Cards/ResourceCards/ResourceCard';
 import SOSCard from '../../Cards/SOSCard/SOSCard';
+import { collection, addDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { db } from '../../Data/firebase';
 import './ResourcesPage.css';
 
 const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSendSOS }) => {
@@ -15,13 +17,12 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sosRequests, setSosRequests] = useState([]);
 
-  const handleAddResource = () => {
+  const handleAddResource = async () => {
     const { item, type, location, date, quantity } = newResource;
     const parsedQuantity = parseInt(quantity);
 
     if (item && type && location && date && parsedQuantity > 0) {
       const newEntry = {
-        id: resources.length + 1,
         item,
         type,
         location,
@@ -30,14 +31,48 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
         date,
         quantity: parsedQuantity,
       };
-      setResources([newEntry, ...(resources || [])]);
-      setNewResource({ item: '', type: '', location: '', date: '', quantity: '1' });
-      setShowAddResourceForm(false);
-    } else {
-      console.log('Invalid resource input:', newResource);
+
+      try {
+        await addDoc(collection(db, "resources"), newEntry);
+        setResources([newEntry, ...resources]); // optionally fetch from Firebase after
+        setNewResource({ item: '', type: '', location: '', date: '', quantity: '1' });
+        setShowAddResourceForm(false);
+      } catch (err) {
+        console.error("Error adding resource to Firebase:", err);
+      }
     }
   };
 
+  useEffect(() => {
+    const fetchResources = async () => {
+      const querySnapshot = await getDocs(collection(db, "resources"));
+      const resourceList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setResources(resourceList);
+    };
+
+    const fetchSOS = async () => {
+      const querySnapshot = await getDocs(collection(db, "sosRequests"));
+      const sosList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setSosRequests(sosList);
+    };
+
+    fetchResources();
+    fetchSOS();
+  }, []);
+  useEffect(() => {
+  const unsubscribeResources = onSnapshot(collection(db, "resources"), (snapshot) => {
+    setResources(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+  });
+
+  const unsubscribeSOS = onSnapshot(collection(db, "sosRequests"), (snapshot) => {
+    setSosRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+  });
+
+  return () => {
+    unsubscribeResources();
+    unsubscribeSOS();
+  };
+}, []);
 
   const filteredResources = resources.filter(resource => {
     if (selectedCategory === 'All') return true;
@@ -60,18 +95,23 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
     }
   };
 
-  const submitSOSInternal = (formData) => {
+  const submitSOSInternal = async (formData) => {
     const newSOS = {
       ...formData,
-      id: sosRequests.length + 1,
       status: 'active',
       time: new Date().toLocaleString(),
     };
-    console.log('Adding SOS:', newSOS); // 👈 Debug log
-    setSosRequests([newSOS, ...sosRequests]);
-    setSosForm({ type: 'Pads Emergency', location: '', description: '' });
-    setShowSOS(false);
+
+    try {
+      await addDoc(collection(db, "sosRequests"), newSOS);
+      setSosRequests([newSOS, ...sosRequests]);
+      setSosForm({ type: 'Pads Emergency', location: '', description: '' });
+      setShowSOS(false);
+    } catch (err) {
+      console.error("Error sending SOS to Firebase:", err);
+    }
   };
+
 
 
   return (
