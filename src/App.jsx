@@ -8,6 +8,7 @@ import SupportPage from './Components/Pages/SupportPage/SupportPage'
 import VolunteersPage from './Components/Pages/VolunteersPage/Volunteers'
 import ProfilePage from './Components/Pages/ProfilePage/ProfilePage'
 import { fetchEvents, addEvent, updateEvent } from './Components/Data/firebaseEvents'
+import { fetchSOSRequests, addSOSRequest } from './Components/Data/firebaseSOS'
 
 const App = () => {
   const [events, setEvents] = useState([])
@@ -31,46 +32,62 @@ const App = () => {
     loadEvents()
   }, [])
 
+  useEffect(() => {
+    const loadEvents = async () => {
+      const data = await fetchEvents()
+      setEvents(data)
+    }
+
+    const loadSOSRequests = async () => {
+      const data = await fetchSOSRequests()
+      setSosRequests(data)
+    }
+
+    loadEvents()
+    loadSOSRequests()
+  }, [])
 
   const handleCreateEvent = async () => {
-  if (newEvent.title && newEvent.location && newEvent.date) {
-    try {
-      if (newEvent.id) {
-        const { id, ...eventData } = newEvent;
-        await updateEvent(id, eventData);
-      } else {
-        await addEvent(newEvent);
+    if (newEvent.title && newEvent.location && newEvent.date) {
+      try {
+        if (newEvent.id) {
+          const { id, ...eventData } = newEvent;
+          await updateEvent(id, eventData);
+        } else {
+          await addEvent(newEvent);
+        }
+
+        const updatedEvents = await fetchEvents();
+        setEvents(updatedEvents);
+
+        setNewEvent({
+          title: '',
+          location: '',
+          date: '',
+          volunteers: 0,
+          category: 'soup-kitchen'
+        });
+        setShowNewEvent(false);
+      } catch (error) {
+        console.error('Failed to create/update event:', error);
+        alert('Error saving event');
       }
-
-      const updatedEvents = await fetchEvents();
-      setEvents(updatedEvents);
-
-      setNewEvent({ 
-        title: '', 
-        location: '', 
-        date: '', 
-        volunteers: 0, 
-        category: 'soup-kitchen' 
-      });
-      setShowNewEvent(false);
-    } catch (error) {
-      console.error('Failed to create/update event:', error);
-      alert('Error saving event');
     }
+  }
+
+
+  const handleSendSOS = async (sosData) => {
+  try {
+    await addSOSRequest(sosData)
+    const updatedSOS = await fetchSOSRequests()
+    setSosRequests(updatedSOS)
+    setShowSOS(false)
+  } catch (error) {
+    console.error('Error sending SOS:', error)
+    alert('Failed to send SOS')
   }
 }
 
-
-  const handleSendSOS = (sosData) => {
-    const newSOS = {
-      id: sosRequests.length + 1,
-      ...sosData,
-      time: 'Just now',
-      status: 'active'
-    }
-    setSosRequests([newSOS, ...sosRequests])
-    setShowSOS(false)
-  }
 
   return (
     <Router>
