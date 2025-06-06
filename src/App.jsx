@@ -7,8 +7,10 @@ import ResourcesPage from './Components/Pages/ResourcesPage/ResourcesPage'
 import SupportPage from './Components/Pages/SupportPage/SupportPage'
 import VolunteersPage from './Components/Pages/VolunteersPage/Volunteers'
 import ProfilePage from './Components/Pages/ProfilePage/ProfilePage'
-import { fetchEvents, addEvent, updateEvent } from './Components/Data/firebaseEvents'
-import { fetchSOSRequests, addSOSRequest } from './Components/Data/firebaseSOS'
+import { addEvent, updateEvent } from './Components/Data/firebaseEvents'
+import { addSOSRequest } from './Components/Data/firebaseSOS'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { db } from './Components/Data/firebase'
 
 const App = () => {
   const [events, setEvents] = useState([])
@@ -25,26 +27,29 @@ const App = () => {
   })
 
   useEffect(() => {
-    const loadEvents = async () => {
-      const data = await fetchEvents()
-      setEvents(data)
-    }
-    loadEvents()
-  }, [])
+  const unsubscribe = onSnapshot(collection(db, "events"), (snapshot) => {
+    const eventsData = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+    setEvents(eventsData)
+  }, (error) => {
+    console.error("Error fetching events:", error)
+  })
 
+  return () => unsubscribe()
+}, [])
+
+
+  // Real-time subscription for SOS requests
   useEffect(() => {
-    const loadEvents = async () => {
-      const data = await fetchEvents()
-      setEvents(data)
-    }
+    const unsubscribeSOS = onSnapshot(collection(db, "sosRequests"), (snapshot) => {
+      const sosData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      setSosRequests(sosData)
+    }, (error) => {
+      console.error("Error fetching SOS requests:", error)
+    })
 
-    const loadSOSRequests = async () => {
-      const data = await fetchSOSRequests()
-      setSosRequests(data)
-    }
-
-    loadEvents()
-    loadSOSRequests()
+    return () => unsubscribeSOS()
   }, [])
 
   const handleCreateEvent = async () => {
@@ -56,9 +61,6 @@ const App = () => {
         } else {
           await addEvent(newEvent);
         }
-
-        const updatedEvents = await fetchEvents();
-        setEvents(updatedEvents);
 
         setNewEvent({
           title: '',
@@ -75,18 +77,16 @@ const App = () => {
     }
   }
 
-
   const handleSendSOS = async (sosData) => {
-  try {
-    await addSOSRequest(sosData)
-    const updatedSOS = await fetchSOSRequests()
-    setSosRequests(updatedSOS)
-    setShowSOS(false)
-  } catch (error) {
-    console.error('Error sending SOS:', error)
-    alert('Failed to send SOS')
+    try {
+      await addSOSRequest(sosData)
+      setSosRequests(updatedSOS)
+      setShowSOS(false)
+    } catch (error) {
+      console.error('Error sending SOS:', error)
+      alert('Failed to send SOS')
+    }
   }
-}
 
 
   return (
