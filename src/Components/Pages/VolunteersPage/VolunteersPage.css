@@ -109,3 +109,33 @@
     background-color: #ea580c; /* orange-600 */
   }
   
+  .volunteer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-join,
+.btn-cancel {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-join {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #ccc;
+  color: black;
+}

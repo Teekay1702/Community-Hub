@@ -12,17 +12,25 @@ const HomePage = ({ events, sosRequests }) => (
       </p>
     </div>
 
-    {sosRequests.filter(sos => sos.status === 'active').length > 0 && (
-      <div className="sos-section">
-        <h3 className="sos-title">
-          <AlertTriangle className="sos-icon" />
-          🆘 Active Emergency Requests
-        </h3>
-        {sosRequests.filter(sos => sos.status === 'active').map(sos => (
-          <SOSCard key={sos.id} sos={sos} />
-        ))}
-      </div>
-    )}
+    {(() => {
+      const activeSos = sosRequests
+        .filter(sos => sos.status === 'active')
+        .sort((a, b) => new Date(b.time) - new Date(a.time)); // newest first
+
+      const latestSos = activeSos[0];
+
+      return latestSos ? (
+        <div className="sos-section">
+          <h3 className="sos-title">
+            <AlertTriangle className="sos-icon" />
+            🆘 Latest Emergency Request
+          </h3>
+          <SOSCard sos={latestSos} />
+        </div>
+      ) : null;
+    })()}
+
+
 
     <div className="services-grid">
       <div className="service-card">
@@ -37,7 +45,7 @@ const HomePage = ({ events, sosRequests }) => (
       </div>
       <div className="service-card">
         <Shield className="service-icon pink" />
-        <h3 className="service-title">Pads Emergency</h3>
+        <h3 className="service-title">Emergency requests</h3>
         <p className="service-description">24/7 SOS support</p>
       </div>
       <div className="service-card">

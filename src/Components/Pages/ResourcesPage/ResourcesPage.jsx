@@ -60,19 +60,19 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
     fetchSOS();
   }, []);
   useEffect(() => {
-  const unsubscribeResources = onSnapshot(collection(db, "resources"), (snapshot) => {
-    setResources(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-  });
+    const unsubscribeResources = onSnapshot(collection(db, "resources"), (snapshot) => {
+      setResources(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
 
-  const unsubscribeSOS = onSnapshot(collection(db, "sosRequests"), (snapshot) => {
-    setSosRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-  });
+    const unsubscribeSOS = onSnapshot(collection(db, "sosRequests"), (snapshot) => {
+      setSosRequests(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
 
-  return () => {
-    unsubscribeResources();
-    unsubscribeSOS();
-  };
-}, []);
+    return () => {
+      unsubscribeResources();
+      unsubscribeSOS();
+    };
+  }, []);
 
   const filteredResources = resources.filter(resource => {
     if (selectedCategory === 'All') return true;
@@ -91,7 +91,7 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
   const handleSubmitSOS = () => {
     if (sosForm.location && sosForm.description) {
       submitSOSInternal(sosForm);
-      setSelectedCategory('Pads Emergency'); // 👈 Automatically switch to SOS view
+      setSelectedCategory('Pads Emergency');
     }
   };
 
@@ -119,15 +119,15 @@ const ResourcesPage = ({ resources, setResources, showSOS, setShowSOS, handleSen
       <div className="header-row">
         <h1 className="page-title">Ubuntu Resources</h1>
         <div>
-          <button onClick={() => setShowAddResourceForm(true)} className="sos-button">➕ Add Resource</button>
+          <button onClick={() => setShowAddResourceForm(true)} className="add-button">➕ Add Resource</button>
           <button onClick={() => setShowSOS(true)} className="sos-button">🆘 SOS Request</button>
         </div>
       </div>
 
       {showAddResourceForm && (
-        <div className="sos-form-container">
-          <h3 className="sos-form-title">➕ Add New Resource</h3>
-          <div className="sos-form">
+        <div className="add-resource-form-container">
+          <h3 className="add-resource-form-title">➕ Add New Resource</h3>
+          <div className="add-resource-form">
             <input
               type="text"
               placeholder="Item Name"
