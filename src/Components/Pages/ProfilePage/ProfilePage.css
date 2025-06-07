@@ -80,4 +80,50 @@
   .section-button:hover {
     background-color: #f9fafb; /* light hover effect */
   }
+
+  .contact-form-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.btn-submit {
+  background-color: #ff7900;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-submit:hover {
+  background-color: #e86f00;
+}
+
+.form-status {
+  margin-top: 0.5rem;
+  color: green;
+  font-weight: 500;
+}
+
   

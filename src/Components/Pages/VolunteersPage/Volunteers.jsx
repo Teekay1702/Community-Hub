@@ -1,28 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../../Data/firebase';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
 import './VolunteersPage.css';
 
-const VolunteersPage = ({ events }) => (
+const VolunteersPage = ({ events }) => {
+  const [showForm, setShowForm] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [volunteerCount, setVolunteerCount] = useState(0);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchVolunteerCount = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'volunteers'));
+        setVolunteerCount(snapshot.size);
+      } catch (error) {
+        console.error('Failed to fetch volunteers:', error);
+        setError('Failed to load volunteer count.');
+      }
+    };
+
+    fetchVolunteerCount();
+  }, []);
+
+  const handleVolunteerSignup = async () => {
+    setMessage('');
+    setError('');
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      await setDoc(doc(db, 'volunteers', email), {
+        email,
+        createdAt: new Date()
+      });
+
+      setEmail('');
+      setPassword('');
+      setShowForm(false);
+      setMessage('Volunteer registered successfully!');
+
+      const snapshot = await getDocs(collection(db, 'volunteers'));
+      setVolunteerCount(snapshot.size);
+    } catch (error) {
+      console.error('Error registering:', error);
+      setError(error.message);
+    }
+  };
+
+  return (
     <div className="volunteers-page">
       <h1 className="page-title">Ubuntu Volunteers</h1>
-      
+
       <section className="impact-summary card">
         <h3 className="section-title">Your Ubuntu Impact</h3>
         <div className="impact-grid">
           <div className="impact-item">
-            <div className="impact-value orange">15</div>
-            <div className="impact-label">Events Joined</div>
-          </div>
-          <div className="impact-item">
-            <div className="impact-value green">67</div>
-            <div className="impact-label">Hours Served</div>
-          </div>
-          <div className="impact-item">
-            <div className="impact-value red">8</div>
-            <div className="impact-label">Lives Touched</div>
+            <div className="impact-value orange">{volunteerCount}</div>
+            <div className="impact-label">Registered Volunteers</div>
           </div>
         </div>
       </section>
-  
+
+      <section className="volunteer-registration card">
+        <h3 className="section-title">Want to Become a Volunteer?</h3>
+
+        {/* Display messages */}
+        {message && <p className="message success">{message}</p>}
+        {error && <p className="message error">{error}</p>}
+
+        {!showForm ? (
+          <button className="btn-join" onClick={() => setShowForm(true)}>
+            Register as a Volunteer
+          </button>
+        ) : (
+          <div className="volunteer-form">
+            <input
+              type="email"
+              placeholder="Your email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Create a password"
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="btn-join" onClick={handleVolunteerSignup}>
+              Submit Registration
+            </button>
+            <button className="btn-cancel" onClick={() => setShowForm(false)}>
+              Cancel
+            </button>
+          </div>
+        )}
+      </section>
+
       <section className="events-list">
         <h3 className="section-title">Ways to Show Ubuntu Spirit</h3>
         {events.map(event => (
@@ -42,6 +120,6 @@ const VolunteersPage = ({ events }) => (
       </section>
     </div>
   );
-  
-  export default VolunteersPage;
-  
+};
+
+export default VolunteersPage;
