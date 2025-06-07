@@ -1,38 +1,75 @@
 import { User } from 'lucide-react';
 import './ProfilePage.css';
+import { useState } from 'react';
 
-const ProfilePage = () => (
-  <div className="profile-page">
-    <div className="profile-card">
-      <div className="profile-avatar">
-        <User className="avatar-icon" />
-      </div>
-      <h2 className="profile-name">Ubuntu Warrior</h2>
-      <p className="profile-subtext">Spreading Ubuntu since 2024</p>
-    </div>
+const ProfilePage = () => {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
 
-    <div className="profile-sections">
-      <div className="profile-section">
-        <h3 className="section-title">Settings</h3>
-        <div className="section-buttons">
-          <button className="section-button">SOS Alert Preferences</button>
-          <button className="section-button">Safe Location Services</button>
-          <button className="section-button">Ubuntu Notifications</button>
-          <button className="section-button">Privacy & Safety</button>
+  const [status, setStatus] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setStatus('');
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // You could integrate an email service here (e.g., EmailJS, Firebase, etc.)
+    console.log('Contact form submitted:', form);
+
+    setStatus('Message sent successfully!');
+    setForm({ name: '', email: '', message: '' });
+  };
+
+  return (
+    <div className="profile-page">
+      <div className="profile-card">
+        <div className="profile-avatar">
+          <User className="avatar-icon" />
         </div>
+        <h2 className="profile-name">Ubuntu Warrior</h2>
+        <p className="profile-subtext">Spreading Ubuntu since 2025</p>
       </div>
 
-      <div className="profile-section">
-        <h3 className="section-title">Ubuntu Support</h3>
-        <div className="section-buttons">
-          <button className="section-button">Help Center</button>
-          <button className="section-button">Contact Ubuntu Team</button>
-          <button className="section-button">Report Safety Issue</button>
-          <button className="section-button">Community Guidelines</button>
-        </div>
+      <div className="profile-sections">
+        <section className="contact-form-section card">
+          <h3>Contact Us</h3>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="name"
+              placeholder="Your name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Your email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+            <textarea
+              name="message"
+              placeholder="Your message"
+              value={form.message}
+              onChange={handleChange}
+              required
+            />
+            <button type="submit" className="btn-submit">Send Message</button>
+            {status && <p className="form-status">{status}</p>}
+          </form>
+        </section>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ProfilePage;
