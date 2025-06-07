@@ -26,6 +26,7 @@ const App = () => {
     category: 'soup-kitchen'
   })
 
+  // Real-time subscription for Events
   useEffect(() => {
   const unsubscribe = onSnapshot(collection(db, "events"), (snapshot) => {
     const eventsData = snapshot.docs
