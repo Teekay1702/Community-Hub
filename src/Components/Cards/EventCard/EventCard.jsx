@@ -53,7 +53,7 @@ const EventCard = ({ event, onEdit, onDelete }) => {
       <div className="card-footer">
         <div className="volunteer-count">
           <Users className="detail-icon" />
-          {event.volunteers}/{event.needed} volunteers
+          {event.volunteers}{event.needed} volunteers
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button className="join-button" onClick={e => e.stopPropagation()}>
