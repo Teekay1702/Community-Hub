@@ -2,7 +2,7 @@ import { User } from 'lucide-react';
 import './ProfilePage.css';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import emailjs from '@emailjs/browser'; // ✅ Import EmailJS
+import emailjs from '@emailjs/browser';
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -33,16 +33,19 @@ const ProfilePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const templateParams = {
+      from_name: form.name,
+      from_email: form.email,
+      message: form.message,
+      reply_to: form.email, // 👈 optional: lets you "reply" directly to sender
+    };
+
     emailjs
       .send(
-        'service_2urq71w', // 🔁 Replace with your EmailJS service ID
-        'template_tkzitdh', // 🔁 Replace with your EmailJS template ID
-        {
-          from_name: form.name,
-          from_email: form.email,
-          message: form.message,
-        },
-        'cvMymiNn_bcU1gDbd' // 🔁 Replace with your EmailJS public key
+        'service_2urq71w',       // Your EmailJS service ID
+        'template_tkzitdh',      // Your EmailJS template ID
+        templateParams,
+        'cvMymiNn_bcU1gDbd'      // Your EmailJS public key
       )
       .then(() => {
         setStatus('Message sent successfully!');
