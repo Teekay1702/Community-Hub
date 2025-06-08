@@ -1,8 +1,11 @@
 import { User } from 'lucide-react';
 import './ProfilePage.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const ProfilePage = () => {
+  const location = useLocation();
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -11,6 +14,17 @@ const ProfilePage = () => {
 
   const [status, setStatus] = useState('');
 
+  // Pre-fill form if data is passed from SOSCard
+  useEffect(() => {
+    if (location.state) {
+      setForm({
+        name: location.state.name || '',
+        email: location.state.email || '',
+        message: location.state.message || '',
+      });
+    }
+  }, [location.state]);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setStatus('');
@@ -18,10 +32,7 @@ const ProfilePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // You could integrate an email service here (e.g., EmailJS, Firebase, etc.)
     console.log('Contact form submitted:', form);
-
     setStatus('Message sent successfully!');
     setForm({ name: '', email: '', message: '' });
   };
