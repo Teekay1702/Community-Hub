@@ -12,7 +12,6 @@ const SupportPage = () => {
   const handleVolunteerSignup = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      alert('Volunteer registered successfully!');
       setEmail('');
       setPassword('');
       setShowForm(false); // hide form after success
