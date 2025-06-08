@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Phone } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../../Data/firebase'; // ✅ Import db from your firebase config
-import { setDoc, doc } from 'firebase/firestore'; // ✅ Firestore functions
+import { auth, db } from '../../Data/firebase';
+import { setDoc, doc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import './SupportPage.css';
 
@@ -10,17 +10,18 @@ const SupportPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [hotlines, setHotlines] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [assistanceMessage, setAssistanceMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleVolunteerSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-
-      // ✅ Save to 'supportVolunteers' collection
       await setDoc(doc(db, 'support', email), {
         email,
         createdAt: new Date()
       });
-
       setEmail('');
       setPassword('');
       setShowForm(false);
@@ -30,9 +31,18 @@ const SupportPage = () => {
       alert(error.message);
     }
   };
-  const [assistanceMessage, setAssistanceMessage] = useState('');
-  const navigate = useNavigate();
 
+  const fetchHotlines = async () => {
+    try {
+      const response = await fetch('/mentalHealth.json');
+      const data = await response.json();
+      setHotlines(data);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Failed to load mental health hotlines:', error);
+      alert('Could not load support hotline info.');
+    }
+  };
 
   return (
     <div className="support-page">
@@ -47,12 +57,39 @@ const SupportPage = () => {
           Ubuntu spirit includes caring for each other's mental wellbeing. Get free support from trained volunteers.
         </p>
         <div className="button-group">
-          <button className="btn call-support">
+          <button className="btn call-support" onClick={fetchHotlines}>
             <Phone className="btn-icon" />
             Call Support
           </button>
         </div>
       </section>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Available Mental Health Hotlines</h2>
+            {hotlines.map((hotline, index) => (
+              <div className="hotline-card" key={index}>
+                <h4>{hotline.name}</h4>
+                <p><strong>Phone:</strong> {hotline.phone}</p>
+                {hotline.sms && <p><strong>SMS:</strong> {hotline.sms}</p>}
+                <p><strong>Available:</strong> {hotline.available}</p>
+                <p><strong>Services:</strong> {hotline.services.join(', ')}</p>
+                {hotline.website && (
+                  <p>
+                    <a href={hotline.website} target="_blank" rel="noopener noreferrer">
+                      Visit Website
+                    </a>
+                  </p>
+                )}
+              </div>
+            ))}
+            <button className="btn close-modal" onClick={() => setShowModal(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <section className="ask-assistance">
         <h3 className="section-title">Ask for Assistance</h3>
@@ -82,7 +119,6 @@ const SupportPage = () => {
         >
           Submit request
         </button>
-
       </section>
 
       <section className="volunteer-support">
@@ -128,7 +164,6 @@ const SupportPage = () => {
           </div>
         )}
       </section>
-
 
       <section className="recent-requests">
         <h3 className="section-title">Recent Support Requests</h3>
