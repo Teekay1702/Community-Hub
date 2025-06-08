@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
 import { Heart, Phone } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../Data/firebase';
+import { auth, db } from '../../Data/firebase'; // ✅ Import db from your firebase config
+import { setDoc, doc } from 'firebase/firestore'; // ✅ Firestore functions
 import './SupportPage.css';
 
 const SupportPage = () => {
-  const [showForm, setShowForm] = useState(false); // toggles form visibility
+  const [showForm, setShowForm] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleVolunteerSignup = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      alert('Volunteer registered successfully!');
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      // ✅ Save to 'supportVolunteers' collection
+      await setDoc(doc(db, 'support', email), {
+        email,
+        createdAt: new Date()
+      });
+
       setEmail('');
       setPassword('');
-      setShowForm(false); // hide form after success
+      setShowForm(false);
+      alert('Support volunteer registered successfully!');
     } catch (error) {
       console.error('Error signing up:', error);
       alert(error.message);
