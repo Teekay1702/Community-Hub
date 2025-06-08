@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Data/firebase';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
 import './VolunteersPage.css';
 
 const VolunteersPage = ({ events }) => {
@@ -72,9 +73,14 @@ const VolunteersPage = ({ events }) => {
         {error && <p className="message error">{error}</p>}
 
         {!showForm ? (
-          <button className="btn-join" onClick={() => setShowForm(true)}>
-            Register as a Volunteer
-          </button>
+          <>
+            <button className="btn-join" onClick={() => setShowForm(true)}>
+              Register as a Volunteer
+            </button>
+            <Link to="/profile" className="btn-request-remove">
+              Request to be Removed
+            </Link>
+          </>
         ) : (
           <div className="volunteer-form">
             <input
@@ -97,8 +103,12 @@ const VolunteersPage = ({ events }) => {
             <button className="btn-cancel" onClick={() => setShowForm(false)}>
               Cancel
             </button>
+            <Link to="/profile" className="btn-request-remove">
+              Request to be Removed
+            </Link>
           </div>
         )}
+
       </section>
 
       <section className="events-list">
@@ -111,9 +121,6 @@ const VolunteersPage = ({ events }) => {
               <span className="volunteer-need">
                 Need {event.needed - event.volunteers} more Ubuntu spirits
               </span>
-              <button className="btn-join">
-                Join Ubuntu Mission
-              </button>
             </div>
           </div>
         ))}
