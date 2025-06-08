@@ -3,7 +3,7 @@ import { Heart, Phone } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Data/firebase'; // ✅ Import db from your firebase config
 import { setDoc, doc } from 'firebase/firestore'; // ✅ Firestore functions
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './SupportPage.css';
 
 const SupportPage = () => {
@@ -30,6 +30,9 @@ const SupportPage = () => {
       alert(error.message);
     }
   };
+  const [assistanceMessage, setAssistanceMessage] = useState('');
+  const navigate = useNavigate();
+
 
   return (
     <div className="support-page">
@@ -56,10 +59,30 @@ const SupportPage = () => {
         <textarea
           placeholder="Describe what kind of help you need... Our community is here to support you."
           className="textarea"
+          value={assistanceMessage}
+          onChange={(e) => setAssistanceMessage(e.target.value)}
         ></textarea>
-        <button className="btn request-help">
+
+        <button
+          className="btn request-help"
+          onClick={() => {
+            if (!assistanceMessage.trim()) {
+              alert('Please describe your support request.');
+              return;
+            }
+
+            navigate('/profile', {
+              state: {
+                name: 'Community Member',
+                email: '',
+                message: `Support Request:\n${assistanceMessage}`,
+              },
+            });
+          }}
+        >
           Submit request
         </button>
+
       </section>
 
       <section className="volunteer-support">
