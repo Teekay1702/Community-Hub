@@ -1,25 +1,32 @@
 import { Heart, Shirt, Shield, BookOpen, AlertTriangle } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
 import SOSCard from '../../Cards/SOSCard/SOSCard';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
-const HomePage = ({ events, sosRequests }) => (
-  <div className="home-page">
-    <div className="hero-banner">
-      <h1 className="hero-title">It Takes A Village</h1>
-      <p className="hero-description">
-        The concept of "It takes a village to raise a child" is a concept that has been forgotten in this time and age and it was meant to be a South African concept of what our core as a nation truly is, the spirit that is the backbone of the country - uBuntu.
-      </p>
-    </div>
+const HomePage = ({ events, sosRequests }) => {
+  const navigate = useNavigate();
 
-    {(() => {
-      const activeSos = sosRequests
-        .filter(sos => sos.status === 'active')
-        .sort((a, b) => new Date(b.time) - new Date(a.time)); // newest first
+  const handleNavigate = (category) => {
+    navigate('/resources', { state: { category } });
+  };
 
-      const latestSos = activeSos[0];
+  const activeSos = sosRequests
+    .filter(sos => sos.status === 'active')
+    .sort((a, b) => new Date(b.time) - new Date(a.time)); // newest first
 
-      return latestSos ? (
+  const latestSos = activeSos[0];
+
+  return (
+    <div className="home-page">
+      <div className="hero-banner">
+        <h1 className="hero-title">It Takes A Village</h1>
+        <p className="hero-description">
+          The concept of "It takes a village to raise a child" is a concept that has been forgotten in this time and age and it was meant to be a South African concept of what our core as a nation truly is, the spirit that is the backbone of the country - uBuntu.
+        </p>
+      </div>
+
+      {latestSos && (
         <div className="sos-section">
           <h3 className="sos-title">
             <AlertTriangle className="sos-icon" />
@@ -27,45 +34,43 @@ const HomePage = ({ events, sosRequests }) => (
           </h3>
           <SOSCard sos={latestSos} />
         </div>
-      ) : null;
-    })()}
+      )}
 
+      <div className="services-grid">
+        <div className="service-card" onClick={() => handleNavigate('Food')}>
+          <Heart className="service-icon red" />
+          <h3 className="service-title">Soup Kitchens</h3>
+          <p className="service-description">5 active stations</p>
+        </div>
+        <div className="service-card" onClick={() => handleNavigate('Clothing')}>
+          <Shirt className="service-icon green" />
+          <h3 className="service-title">Clothing Drives</h3>
+          <p className="service-description">18 donations ready</p>
+        </div>
+        <div className="service-card" onClick={() => handleNavigate('Pads Emergency')}>
+          <Shield className="service-icon pink" />
+          <h3 className="service-title">Emergency requests</h3>
+          <p className="service-description">24/7 SOS support</p>
+        </div>
+        <div className="service-card" onClick={() => handleNavigate('Pads')}>
+          <BookOpen className="service-icon blue" />
+          <h3 className="service-title">School Uniforms</h3>
+          <p className="service-description">Ready for collection</p>
+        </div>
+      </div>
 
-
-    <div className="services-grid">
-      <div className="service-card">
-        <Heart className="service-icon red" />
-        <h3 className="service-title">Soup Kitchens</h3>
-        <p className="service-description">5 active stations</p>
-      </div>
-      <div className="service-card">
-        <Shirt className="service-icon green" />
-        <h3 className="service-title">Clothing Drives</h3>
-        <p className="service-description">18 donations ready</p>
-      </div>
-      <div className="service-card">
-        <Shield className="service-icon pink" />
-        <h3 className="service-title">Emergency requests</h3>
-        <p className="service-description">24/7 SOS support</p>
-      </div>
-      <div className="service-card">
-        <BookOpen className="service-icon blue" />
-        <h3 className="service-title">School Uniforms</h3>
-        <p className="service-description">Ready for collection</p>
+      <div className="events-section">
+        <h2 className="events-heading">Ubuntu Spirit in Action</h2>
+        {events
+          .slice()
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 3)
+          .map(event => (
+            <EventCard key={event.id} event={event} />
+          ))}
       </div>
     </div>
-
-    <div className="events-section">
-      <h2 className="events-heading">Ubuntu Spirit in Action</h2>
-      {events
-        .slice() // to avoid mutating original
-        .sort((a, b) => new Date(b.date) - new Date(a.date)) // sort by most recent
-        .slice(0, 3) // take top 3
-        .map(event => (
-          <EventCard key={event.id} event={event} />
-        ))}
-    </div>
-  </div>
-);
+  );
+};
 
 export default HomePage;

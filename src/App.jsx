@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import MainLayout from './Components/Layout/MainLayout/MainLayout'
 import HomePage from './Components/Pages/HomePage/HomePage'
 import EventsPage from './Components/Pages/EventsPage/EventsPage'
@@ -28,17 +28,21 @@ const App = () => {
 
   // Real-time subscription for Events
   useEffect(() => {
-  const unsubscribe = onSnapshot(collection(db, "events"), (snapshot) => {
-    const eventsData = snapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
-    setEvents(eventsData)
-  }, (error) => {
-    console.error("Error fetching events:", error)
-  })
+    const unsubscribe = onSnapshot(collection(db, "events"), (snapshot) => {
+      const eventsData = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+      setEvents(eventsData)
+    }, (error) => {
+      console.error("Error fetching events:", error)
+    })
 
-  return () => unsubscribe()
-}, [])
+    const location = useLocation();
+    const defaultCategory = location.state?.category || 'All';
+    const [selectedCategory, setSelectedCategory] = useState(defaultCategory);
+
+    return () => unsubscribe()
+  }, [])
 
 
   // Real-time subscription for SOS requests
