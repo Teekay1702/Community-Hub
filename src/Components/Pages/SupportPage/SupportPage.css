@@ -214,3 +214,20 @@
   border: 1px solid #ccc;
   border-radius: 5px;
 }
+.btn-request-remove {
+  background-color: #ffdddd;
+  color: #b00020;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  border: 1px solid #b00020;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.btn-request-remove:hover {
+  background-color: #ffe5e5;
+}

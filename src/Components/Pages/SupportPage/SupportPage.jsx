@@ -3,6 +3,7 @@ import { Heart, Phone } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Data/firebase'; // ✅ Import db from your firebase config
 import { setDoc, doc } from 'firebase/firestore'; // ✅ Firestore functions
+import { Link } from 'react-router-dom';
 import './SupportPage.css';
 
 const SupportPage = () => {
@@ -33,7 +34,7 @@ const SupportPage = () => {
   return (
     <div className="support-page">
       <h1 className="page-title">Mental Health & Support</h1>
-      
+
       <section className="mental-health-support">
         <h3 className="section-title with-icon">
           <Heart className="icon" />
@@ -52,7 +53,7 @@ const SupportPage = () => {
 
       <section className="ask-assistance">
         <h3 className="section-title">Ask for Assistance</h3>
-        <textarea 
+        <textarea
           placeholder="Describe what kind of help you need... Our community is here to support you."
           className="textarea"
         ></textarea>
@@ -68,9 +69,14 @@ const SupportPage = () => {
         </p>
 
         {!showForm ? (
-          <button className="btn become-volunteer" onClick={() => setShowForm(true)}>
-            Register as a Support Volunteer
-          </button>
+          <>
+            <button className="btn become-volunteer" onClick={() => setShowForm(true)}>
+              Register as a Support Volunteer
+            </button>
+            <Link to="/profile" className="btn-request-remove">
+              Request to be Removed
+            </Link>
+          </>
         ) : (
           <div className="volunteer-form">
             <input
@@ -90,12 +96,16 @@ const SupportPage = () => {
             <button className="btn-submit-volunteer" onClick={handleVolunteerSignup}>
               Submit Registration
             </button>
-            <button className="btn-cancel-volunteer" onClick={() => setShowForm(false)}>
+            <button className="btn become-volunteer" onClick={() => setShowForm(false)}>
               Cancel
             </button>
+            <Link to="/profile" className="btn-request-remove">
+              Request to be Removed
+            </Link>
           </div>
         )}
       </section>
+
 
       <section className="recent-requests">
         <h3 className="section-title">Recent Support Requests</h3>
