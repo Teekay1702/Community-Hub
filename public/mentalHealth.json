@@ -1,0 +1,56 @@
+[
+  {
+    "name": "South African Depression and Anxiety Group (SADAG)",
+    "phone": "0800 567 567",
+    "sms": "31393",
+    "available": "24/7",
+    "services": [
+      "Suicide Prevention",
+      "Depression & Anxiety Support",
+      "Trauma Counseling",
+      "Substance Abuse Help"
+    ],
+    "website": "https://www.sadag.org"
+  },
+  {
+    "name": "Lifeline South Africa",
+    "phone": "0861 322 322",
+    "available": "24/7",
+    "services": [
+      "Telephonic Counselling",
+      "Emotional Support"
+    ],
+    "website": "https://www.lifelinesa.co.za"
+  },
+  {
+    "name": "Childline South Africa",
+    "phone": "0800 055 555",
+    "available": "24/7",
+    "services": [
+      "Child Abuse Support",
+      "Family Counseling",
+      "Trauma Help for Children and Teens"
+    ],
+    "website": "https://www.childlinesa.org.za"
+  },
+  {
+    "name": "Akeso Psychiatric Response Unit (PRU)",
+    "phone": "0861 435 787",
+    "available": "24/7",
+    "services": [
+      "Emergency Psychiatric Support",
+      "Crisis Response",
+      "Referrals to Professionals"
+    ],
+    "website": "https://www.akeso.co.za"
+  },
+  {
+    "name": "SAPS Gender-Based Violence Hotline",
+    "phone": "0800 150 150",
+    "available": "24/7",
+    "services": [
+      "Gender-Based Violence Support",
+      "Domestic Abuse Reporting"
+    ]
+  }
+]
