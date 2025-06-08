@@ -2,6 +2,7 @@ import { User } from 'lucide-react';
 import './ProfilePage.css';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import emailjs from '@emailjs/browser'; // ✅ Import EmailJS
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -14,7 +15,6 @@ const ProfilePage = () => {
 
   const [status, setStatus] = useState('');
 
-  // Pre-fill form if data is passed from SOSCard
   useEffect(() => {
     if (location.state) {
       setForm({
@@ -32,9 +32,26 @@ const ProfilePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Contact form submitted:', form);
-    setStatus('Message sent successfully!');
-    setForm({ name: '', email: '', message: '' });
+
+    emailjs
+      .send(
+        'service_2urq71w', // 🔁 Replace with your EmailJS service ID
+        'template_tkzitdh', // 🔁 Replace with your EmailJS template ID
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        },
+        'cvMymiNn_bcU1gDbd' // 🔁 Replace with your EmailJS public key
+      )
+      .then(() => {
+        setStatus('Message sent successfully!');
+        setForm({ name: '', email: '', message: '' });
+      })
+      .catch((error) => {
+        console.error('EmailJS error:', error);
+        setStatus('Failed to send message. Please try again.');
+      });
   };
 
   return (
