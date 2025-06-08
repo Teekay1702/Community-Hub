@@ -15,7 +15,7 @@ const SupportPage = () => {
       await createUserWithEmailAndPassword(auth, email, password);
 
       // ✅ Save to 'supportVolunteers' collection
-      await setDoc(doc(db, 'supportVolunteers', email), {
+      await setDoc(doc(db, 'support', email), {
         email,
         createdAt: new Date()
       });
