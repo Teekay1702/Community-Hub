@@ -7,9 +7,11 @@ import {
   BookOpen,
   Package,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './EventCard.css';
 
 const EventCard = ({ event, onEdit, onDelete }) => {
+  const navigate = useNavigate();
   const getCategoryIcon = (category) => {
     switch (category) {
       case 'soup-kitchen':
@@ -21,6 +23,11 @@ const EventCard = ({ event, onEdit, onDelete }) => {
       default:
         return <Package className="icon gray" />;
     }
+  };
+
+  const handleJoin = (e) => {
+    e.stopPropagation();
+    navigate('/volunteers', { state: { showForm: true } });
   };
 
   const handleDelete = (e) => {
@@ -56,7 +63,7 @@ const EventCard = ({ event, onEdit, onDelete }) => {
           {event.volunteers}{event.needed} volunteers
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="join-button" onClick={e => e.stopPropagation()}>
+          <button className="join-button" onClick={handleJoin}>
             Join Ubuntu Spirit
           </button>
           <button

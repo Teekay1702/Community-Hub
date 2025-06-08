@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Data/firebase';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './VolunteersPage.css';
 
 const VolunteersPage = ({ events }) => {
@@ -12,6 +12,7 @@ const VolunteersPage = ({ events }) => {
   const [volunteerCount, setVolunteerCount] = useState(0);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
     const fetchVolunteerCount = async () => {
@@ -26,6 +27,13 @@ const VolunteersPage = ({ events }) => {
 
     fetchVolunteerCount();
   }, []);
+
+  useEffect(() => {
+    const shouldOpen = location.state?.showForm;
+    if (shouldOpen) {
+      setShowForm(true);
+    }
+  }, [location.state]);
 
   const handleVolunteerSignup = async () => {
     setMessage('');
