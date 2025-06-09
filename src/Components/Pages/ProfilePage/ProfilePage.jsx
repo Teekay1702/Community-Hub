@@ -34,11 +34,13 @@ const ProfilePage = () => {
     e.preventDefault();
 
     const templateParams = {
-      from_name: 'Test User',
+      from_name: form.name,
       from_email: form.email,
       message: form.message,
       reply_to: form.email,
     };
+    
+    console.log('templateParams being sent to EmailJS:', templateParams);
 
     console.log('Submitting form:', form);
 
