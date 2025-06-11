@@ -13,7 +13,7 @@ const HomePage = ({ events, sosRequests }) => {
 
   const activeSos = sosRequests
     .filter(sos => sos.status === 'active')
-    .sort((a, b) => new Date(b.time) - new Date(a.time)); // newest first
+    .sort((a, b) => new Date(b.time) - new Date(a.time));
 
   const latestSos = activeSos[0];
 
