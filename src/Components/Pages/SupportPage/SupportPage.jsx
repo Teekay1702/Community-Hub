@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Heart, Phone} from 'lucide-react';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth, db} from '../../Data/firebase';
-import {setDoc, doc} from 'firebase/firestore';
+import {collection, getDocs, setDoc, doc} from 'firebase/firestore';
 import {Link, useNavigate} from 'react-router-dom';
 import './SupportPage.css';
 
@@ -14,9 +14,23 @@ const SupportPage = () => {
 	const [hotlines, setHotlines] = useState([]);
 	const [message, setMessage] = useState('');
 	const [messageType, setMessageType] = useState('');
+  const [supportCount, setSupportCount] = useState(0);
 	const [showModal, setShowModal] = useState(false);
 	const [assistanceMessage, setAssistanceMessage] = useState('');
 	const navigate = useNavigate();
+
+  useEffect(() => {
+      const fetchVolunteerCount = async () => {
+        try {
+          const snapshot = await getDocs(collection(db, 'support'));
+          setSupportCount(snapshot.size);
+        } catch (error) {
+          console.error('Failed to fetch volunteers:', error);
+        }
+      };
+  
+      fetchVolunteerCount();
+    }, []);
 
 	const handleVolunteerSignup = async () => {
 		try {
@@ -60,6 +74,17 @@ const SupportPage = () => {
 	return (
 		<div className="support-page">
 			<h1 className="page-title">Mental Health & Support</h1>
+
+      <section className="impact-summary card">
+				<h3 className="section-title">Your Ubuntu Impact</h3>
+				<div className="impact-grid">
+					<div className="impact-item">
+						<div className="impact-value orange">
+							{supportCount}</div>
+						<div className="impact-label">Registered Volunteers</div>
+					</div>
+				</div>
+			</section>
 
 			<section className="mental-health-support">
 				<h3 className="section-title with-icon">
