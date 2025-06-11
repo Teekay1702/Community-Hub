@@ -4,7 +4,7 @@ import SOSCard from '../../Cards/SOSCard/SOSCard';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
-const HomePage = ({ events, sosRequests }) => {
+const HomePage = ({ events, sosRequests, resources }) => {
   const navigate = useNavigate();
 
   const handleNavigate = (category) => {
@@ -13,9 +13,15 @@ const HomePage = ({ events, sosRequests }) => {
 
   const activeSos = sosRequests
     .filter(sos => sos.status === 'active')
-    .sort((a, b) => new Date(b.time) - new Date(a.time)); // newest first
+    .sort((a, b) => new Date(b.time) - new Date(a.time));
 
   const latestSos = activeSos[0];
+
+  const foodCount = resources.filter(r => r.type === 'Food' && r.status === 'Available').length;
+  const clothingCount = resources.filter(r => r.type === 'Clothing' && r.status === 'Available').length;
+  const padsCount = resources.filter(r => r.type === 'Pads' && r.status === 'Available' && r.urgency !== 'emergency').length;
+  const emergencyPadsCount = resources.filter(r => r.type === 'Pads' && r.urgency === 'emergency').length;
+
 
   return (
     <div className="home-page">
@@ -39,23 +45,23 @@ const HomePage = ({ events, sosRequests }) => {
       <div className="services-grid">
         <div className="service-card" onClick={() => handleNavigate('Food')}>
           <Heart className="service-icon red" />
-          <h3 className="service-title">Soup Kitchens</h3>
-          <p className="service-description">5 active stations</p>
+          <h3 className="service-title">Food Drives</h3>
+          <p className="service-description">{foodCount} available</p>
         </div>
         <div className="service-card" onClick={() => handleNavigate('Clothing')}>
           <Shirt className="service-icon green" />
           <h3 className="service-title">Clothing Drives</h3>
-          <p className="service-description">18 donations ready</p>
+          <p className="service-description">{clothingCount} available</p>
         </div>
         <div className="service-card" onClick={() => handleNavigate('Pads Emergency')}>
           <Shield className="service-icon pink" />
           <h3 className="service-title">Emergency requests</h3>
-          <p className="service-description">24/7 SOS support</p>
+          <p className="service-description">{emergencyPadsCount} available</p>
         </div>
         <div className="service-card" onClick={() => handleNavigate('Pads')}>
           <BookOpen className="service-icon blue" />
-          <h3 className="service-title">School Uniforms</h3>
-          <p className="service-description">Ready for collection</p>
+          <h3 className="service-title">Pads</h3>
+          <p className="service-description">{padsCount} available</p>
         </div>
       </div>
 

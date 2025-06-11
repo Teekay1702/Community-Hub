@@ -6,9 +6,16 @@ import {
   Shield,
   Package,
 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { doc, updateDoc} from 'firebase/firestore';
+import { db } from '../../Data/firebase'
 import './ResourceCard.css';
 
 const ResourceCard = ({ resource }) => {
+  const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const getIcon = (type) => {
     switch (type) {
       case 'Food':
@@ -38,6 +45,26 @@ const ResourceCard = ({ resource }) => {
     }
   };
 
+  const handleCollectClick = () => {
+    navigate('/profile', {
+      state: {
+        message: `I am willing to collect this item: ${resource.item}`,
+      },
+    });
+  };
+
+  const handleMarkAsCollected = async () => {
+    try {
+      const resourceRef = doc(db, 'resources', resource.id);
+      await updateDoc(resourceRef, {
+        status: 'Collected',
+      });
+      setShowConfirm(false);
+    } catch (error) {
+      console.error('Error updating resource:', error);
+    }
+  };
+
   return (
     <div className="resource-card">
       <div className="card-header">
@@ -60,11 +87,24 @@ const ResourceCard = ({ resource }) => {
           </button>
         ) : (
           <>
-            <button className="button collect">Help Collect</button>
-            <button className="button donate">Donate Similar</button>
+            <button className="button collect" onClick={handleCollectClick}>Help Collect</button>
+            <button className="button donate" onClick={() => setShowConfirm(true)}>Collected</button>
           </>
         )}
       </div>
+       {showConfirm && (
+        <div className="confirmation-popup">
+          <p>Are you sure you want to mark this resource as collected?</p>
+          <div className="confirmation-buttons">
+            <button className="yes-button" onClick={handleMarkAsCollected}>
+              Yes
+            </button>
+            <button className="no-button" onClick={() => setShowConfirm(false)}>
+              No
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

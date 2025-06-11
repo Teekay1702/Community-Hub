@@ -10,6 +10,7 @@ const ProfilePage = () => {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    phone: '',
     message: '',
   });
 
@@ -20,6 +21,7 @@ const ProfilePage = () => {
       setForm({
         name: location.state.name || '',
         email: location.state.email || '',
+        phone: location.state.phone || '',
         message: location.state.message || '',
       });
     }
@@ -36,10 +38,11 @@ const ProfilePage = () => {
     const templateParams = {
       from_name: form.name,
       from_email: form.email,
+      from_phone: form.phone,
       message: form.message,
       reply_to: form.email,
     };
-    
+
     console.log('templateParams being sent to EmailJS:', templateParams);
 
     console.log('Submitting form:', form);
@@ -88,6 +91,14 @@ const ProfilePage = () => {
               name="email"
               placeholder="Your email"
               value={form.email}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Your phone number"
+              value={form.phone}
               onChange={handleChange}
               required
             />

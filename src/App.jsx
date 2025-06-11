@@ -99,7 +99,7 @@ const App = () => {
         <Route
           element={<MainLayout sosRequests={sosRequests} />}
         >
-          <Route path="/home" element={<HomePage events={events} sosRequests={sosRequests} />} />
+          <Route path="/home" element={<HomePage events={events} sosRequests={sosRequests} resources={resources} />} />
           <Route path="/events" element={
             <EventsPage
               events={events}
