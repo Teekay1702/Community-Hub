@@ -8,8 +8,6 @@ const SOSCard = ({ sos }) => {
   const handleRespond = () => {
     navigate('/profile', {
       state: {
-        name: 'SOS Responder',
-        email: '',
         message: `Responding to SOS: ${sos.type}\nLocation: ${sos.location}\nTime: ${sos.time}`,
       },
     });
