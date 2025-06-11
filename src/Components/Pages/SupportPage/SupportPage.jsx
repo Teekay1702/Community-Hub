@@ -17,6 +17,7 @@ const SupportPage = () => {
 	const [supportCount, setSupportCount] = useState(0);
 	const [showModal, setShowModal] = useState(false);
 	const [assistanceMessage, setAssistanceMessage] = useState('');
+	const [error, setError] = useState('');
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -46,7 +47,7 @@ const SupportPage = () => {
 				setMessage('');
 				setMessageType('');
 			}, 4000);
-			console.log('Volunteer registered:', { name, email });
+			console.log('Support volunteer registered:', { name, email });
 		} catch (error) {
 			console.error('Error signing up:', error);
 			setMessage(error.message);
@@ -165,32 +166,37 @@ const SupportPage = () => {
 
 			<section className="ask-assistance">
 				<h3 className="section-title">Ask for Assistance</h3>
-				<textarea placeholder="Describe what kind of help you need... Our community is here to support you." className="textarea"
+				<textarea
+					placeholder="Describe what kind of help you need... Our community is here to support you."
+					className="textarea"
 					value={assistanceMessage}
-					onChange={
-						(e) => setAssistanceMessage(e.target.value)
-					}></textarea>
+					onChange={(e) => {
+						setAssistanceMessage(e.target.value);
+						if (error) setError('');
+					}}
+				></textarea>
 
-				<button className="btn request-help"
-					onClick={
-						() => {
-							if (!assistanceMessage.trim()) {
-								alert('Please describe your support request.');
-								return;
-							}
-
-							navigate('/profile', {
-								state: {
-									name: 'Community Member',
-									email: '',
-									message: `Support Request:\n${assistanceMessage}`
-								}
-							});
+				<button
+					className="btn request-help"
+					onClick={() => {
+						if (!assistanceMessage.trim()) {
+							setError('Please describe your support request.');
+							return;
 						}
-					}>
+
+						navigate('/profile', {
+							state: {
+								message: `Support Request:\n${assistanceMessage}`
+							}
+						});
+					}}
+				>
 					Submit request
 				</button>
+
+				{error && <p className="error-text">{error}</p>}
 			</section>
+
 
 			<section className="volunteer-support">
 				<h3 className="section-title">Volunteer as Mental Health Support</h3>

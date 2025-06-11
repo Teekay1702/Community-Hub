@@ -297,3 +297,9 @@
   80% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+.error-message {
+  color: red;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}

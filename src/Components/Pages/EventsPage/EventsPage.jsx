@@ -14,7 +14,8 @@ const EventsPage = () => {
     date: '',
     volunteers: ''
   });
-
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
 
   // Fetch all events on load
   useEffect(() => {
@@ -27,43 +28,57 @@ const EventsPage = () => {
 
   // Handle create button click
   const handleCreateEvent = async () => {
-  try {
-    if (!newEvent.title || !newEvent.location || !newEvent.date) {
-      alert('Please fill in all required fields.');
-      return;
+    try {
+      if (!newEvent.title || !newEvent.location || !newEvent.date) {
+        setMessage('Please fill in all required fields.');
+        setTimeout(() => {
+          setMessage('');
+          setMessageType('');
+        }, 1000);
+        return;
+      }
+
+      if (newEvent.id) {
+        // Updating an existing event
+        const { id, ...eventData } = newEvent;
+        await updateEvent(id, eventData);
+        setMessage('Event updated successfully!');
+        setMessageType('success');
+      } else {
+        // Creating a new event
+        await addEvent(newEvent);
+        setMessage('Event created successfully!');
+        setMessageType('success');
+      }
+
+      setNewEvent({
+        title: '',
+        category: '',
+        location: '',
+        date: '',
+        volunteers: ''
+      });
+      setShowNewEvent(false);
+
+      const updatedEvents = await fetchEvents();
+      setEvents(updatedEvents);
+    } catch (error) {
+      console.error('Failed to create/update event:', error);
+      setMessage('Failed to create or update event. Please try again.');
+      setMessageType('error');
     }
 
-    if (newEvent.id) {
-      // Updating an existing event
-      const { id, ...eventData } = newEvent;
-      await updateEvent(id, eventData);
-    } else {
-      // Creating a new event
-      await addEvent(newEvent);
-    }
-
-    setNewEvent({
-      title: '',
-      category: '',
-      location: '',
-      date: '',
-      volunteers: ''
-    });
-    setShowNewEvent(false);
-
-    const updatedEvents = await fetchEvents();
-    setEvents(updatedEvents);
-  } catch (error) {
-    console.error('Failed to create/update event:', error);
-    alert('Failed to create or update event. Please try again.');
-  }
-};
+    setTimeout(() => {
+      setMessage('');
+      setMessageType('');
+    }, 2000);
+  };
 
 
   const handleEdit = (event) => {
-  setNewEvent(event);           // Load the clicked event into the form
-  setShowNewEvent(true);        // Show the form for editing
-};
+    setNewEvent(event);           // Load the clicked event into the form
+    setShowNewEvent(true);        // Show the form for editing
+  };
 
 
   const handleDelete = async (id) => {
@@ -102,9 +117,9 @@ const EventsPage = () => {
               onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
               className="form-input"
             >
-              <option value="soup-kitchen">Community Soup Kitchen</option>
+              <option value="">Select Category</option>
+              <option value="soup-kitchen">Food Drive</option>
               <option value="clothing">Clothing Drive</option>
-              <option value="uniforms">School Uniforms</option>
               <option value="pads">Pads Drive</option>
               <option value="food">Food Sharing</option>
             </select>
@@ -139,7 +154,11 @@ const EventsPage = () => {
           </div>
         </div>
       )}
-
+      {message && (
+        <p className={`event-message ${messageType}`}>
+          {message}
+        </p>
+      )}
       <div className="events-list">
         {events.map((event) => (
           <EventCard

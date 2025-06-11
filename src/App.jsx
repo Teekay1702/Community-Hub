@@ -73,7 +73,6 @@ const App = () => {
         setShowNewEvent(false);
       } catch (error) {
         console.error('Failed to create/update event:', error);
-        alert('Error saving event');
       }
     }
   }
@@ -85,7 +84,6 @@ const App = () => {
       setShowSOS(false)
     } catch (error) {
       console.error('Error sending SOS:', error)
-      alert('Failed to send SOS')
     }
   }
 
