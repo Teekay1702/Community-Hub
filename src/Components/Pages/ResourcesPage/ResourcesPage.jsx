@@ -13,7 +13,7 @@ const ResourcesPage = ({resources, setResources, showSOS, setShowSOS}) => {
 		type: '',
 		location: '',
 		date: '',
-		quantity: '1'
+		quantity: ''
 	});
 	const location = useLocation();
 	const [selectedCategory, setSelectedCategory] = useState(location.state ?. category || 'All');
@@ -51,7 +51,7 @@ const ResourcesPage = ({resources, setResources, showSOS, setShowSOS}) => {
 					type: '',
 					location: '',
 					date: '',
-					quantity: '1'
+					quantity: ''
 				});
 				setShowAddResourceForm(false);
 			} catch (err) {
