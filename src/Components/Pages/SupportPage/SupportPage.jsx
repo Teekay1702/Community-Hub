@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Phone } from 'lucide-react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../Data/firebase';
-import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc, addDoc, serverTimestamp, arrayUnion, updateDoc } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import './SupportPage.css';
 
@@ -18,6 +18,8 @@ const SupportPage = () => {
 	const [showModal, setShowModal] = useState(false);
 	const [assistanceMessage, setAssistanceMessage] = useState('');
 	const [error, setError] = useState('');
+	const [requests, setRequests] = useState([]);
+	const [selectedRequest, setSelectedRequest] = useState(null);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -71,6 +73,42 @@ const SupportPage = () => {
 			alert('Could not load support hotline info.');
 		}
 	};
+
+	const handleSubmitRequest = async () => {
+		if (!assistanceMessage.trim()) {
+			setError('Please describe your support request.');
+			return;
+		}
+
+		await addDoc(collection(db, 'supportRequests'), {
+			text: assistanceMessage,
+			timestamp: serverTimestamp(),
+			responders: []
+		});
+
+		setAssistanceMessage('');
+	};
+
+	useEffect(() => {
+		const fetchRequests = async () => {
+			const snapshot = await getDocs(collection(db, 'supportRequests'));
+			const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+			setRequests(data);
+		};
+		fetchRequests();
+	}, []);
+
+	const formatTimeAgo = (date) => {
+		const now = new Date();
+		const diff = Math.floor((now - date) / 1000); // seconds
+		if (diff < 60) return `${diff} seconds ago`;
+		if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+		if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+		return `${Math.floor(diff / 86400)} days ago`;
+	};
+
+	const formatDate = (date) =>
+		date.toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' });
 
 	return (
 		<div className="support-page">
@@ -178,21 +216,28 @@ const SupportPage = () => {
 
 				<button
 					className="btn request-help"
-					onClick={() => {
+					onClick={async () => {
 						if (!assistanceMessage.trim()) {
 							setError('Please describe your support request.');
 							return;
 						}
 
-						navigate('/profile', {
-							state: {
-								message: `Support Request:\n${assistanceMessage}`
-							}
-						});
+						try {
+							await handleSubmitRequest(); // 🔥 Save to Firestore
+							navigate('/profile', {
+								state: {
+									message: `Support Request:\n${assistanceMessage}`
+								}
+							});
+						} catch (err) {
+							console.error("Failed to submit support request:", err);
+							setError("There was an error submitting your request. Please try again.");
+						}
 					}}
 				>
 					Submit request
 				</button>
+
 
 				{error && <p className="error-text">{error}</p>}
 			</section>
@@ -259,18 +304,62 @@ const SupportPage = () => {
 					)
 				} </section>
 
+			{/*Add recent  support requests*/}
 			<section className="recent-requests">
 				<h3 className="section-title">Recent Support Requests</h3>
-				<div className="requests-list">
-					<div className="request-item border-blue">
-						<p className="request-text">Someone in Soweto needs emotional support</p>
-						<p className="request-meta">2 hours ago • 3 volunteers responded</p>
+				{requests.map((req) => (
+					<div
+						key={req.id}
+						className="request-item clickable"
+						onClick={() => setSelectedRequest(req)}
+					>
+						<p className="request-text">{req.text}</p>
+						<p className="request-meta">
+							{formatTimeAgo(req.timestamp?.toDate())} • {req.responders?.length || 0} volunteers
+						</p>
 					</div>
-					<div className="request-item border-green">
-						<p className="request-text">Family in Khayelitsha needs guidance</p>
-						<p className="request-meta">Yesterday • Resolved</p>
+				))}
+				{selectedRequest && (
+					<div className="modal-overlay">
+						<div className="modal-content">
+							<h3>{selectedRequest.text}</h3>
+							<p>Posted: {formatDate(selectedRequest.timestamp?.toDate())}</p>
+
+							<h4>Responders:</h4>
+							<ul>
+								{selectedRequest.responders?.map((res, i) => (
+									<li key={i}>{res.name} — {formatTimeAgo(new Date(res.time))}</li>
+								))}
+							</ul>
+							<div className="button-row">
+								<button
+									className="btn btn-help"
+									onClick={async () => {
+										const docRef = doc(db, 'supportRequests', selectedRequest.id);
+										await updateDoc(docRef, {
+											responders: arrayUnion({
+												name: 'Anonymous Volunteer',
+												time: new Date().toISOString()
+											})
+										});
+
+										navigate('/profile', {
+											state: {
+												message: `I'd be willing to help with: "${selectedRequest.text}"`
+											}
+										});
+									}}
+								>
+									I’ll help
+								</button>
+
+
+								<button className="btn btn-cancel" onClick={() => setSelectedRequest(null)}>Close</button>
+							</div>
+						</div>
 					</div>
-				</div>
+				)}
+
 			</section>
 		</div>
 	);
