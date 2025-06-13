@@ -43,6 +43,8 @@ const ProfilePage = () => {
       reply_to: form.email,
     };
 
+    setStatus('Sending...');
+
     console.log('templateParams being sent to EmailJS:', templateParams);
 
     console.log('Submitting form:', form);
