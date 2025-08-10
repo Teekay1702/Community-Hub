@@ -1,0 +1,6 @@
+{
+  "appId": "com.tokoloho.communityhub",
+  "appName": "community-hub",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
