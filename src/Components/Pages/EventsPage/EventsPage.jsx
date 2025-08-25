@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
 import { fetchEvents, addEvent, deleteEvent, updateEvent } from '../../Data/firebaseEvents';
+import emailjs from "emailjs-com";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../Data/firebase";  // ensure db is exported from your firebase.js
 import './Events.css';
 
 const EventsPage = () => {
@@ -30,10 +33,10 @@ const EventsPage = () => {
   const handleCreateEvent = async () => {
     try {
       if (!newEvent.title || !newEvent.location || !newEvent.date) {
-        setMessage('Please fill in all required fields.');
+        setMessage("Please fill in all required fields.");
         setTimeout(() => {
-          setMessage('');
-          setMessageType('');
+          setMessage("");
+          setMessageType("");
         }, 1000);
         return;
       }
@@ -42,37 +45,64 @@ const EventsPage = () => {
         // Updating an existing event
         const { id, ...eventData } = newEvent;
         await updateEvent(id, eventData);
-        setMessage('Event updated successfully!');
-        setMessageType('success');
+        setMessage("Event updated successfully!");
+        setMessageType("success");
       } else {
         // Creating a new event
         await addEvent(newEvent);
-        setMessage('Event created successfully!');
-        setMessageType('success');
+        setMessage("Event created successfully!");
+        setMessageType("success");
+
+        // 🔹 Fetch all volunteers after creating the event
+        const snapshot = await getDocs(collection(db, "volunteers"));
+        const volunteers = snapshot.docs.map(doc => doc.data().email);
+
+        // 🔹 Send email to each volunteer using EmailJS
+        volunteers.forEach(email => {
+          emailjs.send(
+            'service_2urq71w',
+            'template_tkzitdh',
+            {
+              to_email: email,
+              event_title: newEvent.title,
+              event_date: newEvent.date,
+              event_location: newEvent.location,
+            },
+            "cvMymiNn_bcU1gDbd"
+          ).then(
+            (result) => {
+              console.log("Email sent to:", email, result.text);
+            },
+            (error) => {
+              console.error("EmailJS error:", error.text);
+            }
+          );
+        });
       }
 
       setNewEvent({
-        title: '',
-        category: '',
-        location: '',
-        date: '',
-        volunteers: ''
+        title: "",
+        category: "",
+        location: "",
+        date: "",
+        volunteers: ""
       });
       setShowNewEvent(false);
 
       const updatedEvents = await fetchEvents();
       setEvents(updatedEvents);
     } catch (error) {
-      console.error('Failed to create/update event:', error);
-      setMessage('Failed to create or update event. Please try again.');
-      setMessageType('error');
+      console.error("Failed to create/update event:", error);
+      setMessage("Failed to create or update event. Please try again.");
+      setMessageType("error");
     }
 
     setTimeout(() => {
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
     }, 2000);
   };
+
 
 
   const handleEdit = (event) => {
