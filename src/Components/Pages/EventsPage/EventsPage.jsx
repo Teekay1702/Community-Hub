@@ -55,13 +55,16 @@ const EventsPage = () => {
 
         // 🔹 Fetch all volunteers after creating the event
         const snapshot = await getDocs(collection(db, "volunteers"));
-        const volunteers = snapshot.docs.map(doc => doc.data().email);
+        const volunteers = snapshot.docs
+          .map(doc => doc.data().email)
+          .filter(email => email && email.includes("@"))   // keep only valid emails
+          .map(email => email.trim());                     // remove spaces
 
         // 🔹 Send email to each volunteer using EmailJS
         volunteers.forEach(email => {
           emailjs.send(
             'service_2urq71w',
-            'template_tkzitdh',
+            'template_pa7cyff',
             {
               to_email: email,
               event_title: newEvent.title,
@@ -71,13 +74,14 @@ const EventsPage = () => {
             "cvMymiNn_bcU1gDbd"
           ).then(
             (result) => {
-              console.log("Email sent to:", email, result.text);
+              console.log("✅ Email sent to:", email, result.text);
             },
             (error) => {
-              console.error("EmailJS error:", error.text);
+              console.error("❌ EmailJS error:", email, error.text);
             }
           );
         });
+
       }
 
       setNewEvent({
