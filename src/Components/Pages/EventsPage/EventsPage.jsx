@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
+import LocationInput from './LocationInput';
 import { fetchEvents, addEvent, deleteEvent, updateEvent } from '../../Data/firebaseEvents';
 import emailjs from "emailjs-com";
 import { collection, getDocs } from "firebase/firestore";
@@ -157,13 +158,11 @@ const EventsPage = () => {
               <option value="pads">Pads Drive</option>
               <option value="food">Food Sharing</option>
             </select>
-            <input
-              type="text"
-              placeholder="Safe Location"
+            <LocationInput
               value={newEvent.location}
-              onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-              className="form-input"
+              onChange={(val) => setNewEvent({ ...newEvent, location: val })}
             />
+
             <input
               type="date"
               value={newEvent.date}
