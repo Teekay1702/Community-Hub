@@ -158,9 +158,12 @@ const EventsPage = () => {
               <option value="pads">Pads Drive</option>
               <option value="food">Food Sharing</option>
             </select>
-            <LocationInput
+            <input
+              type="text"
+              placeholder="Safe Location"
               value={newEvent.location}
-              onChange={(val) => setNewEvent({ ...newEvent, location: val })}
+              onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+              className="form-input"
             />
 
             <input
