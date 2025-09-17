@@ -54,35 +54,32 @@ const EventsPage = () => {
         setMessage("Event created successfully!");
         setMessageType("success");
 
-        // 🔹 Fetch all volunteers after creating the event
+        // Fetch volunteers
         const snapshot = await getDocs(collection(db, "volunteers"));
-        const volunteers = snapshot.docs
-          .map(doc => doc.data().email)
-          .filter(email => email && email.includes("@"))   // keep only valid emails
-          .map(email => email.trim());                     // remove spaces
+        const volunteers = snapshot.docs.map(doc => doc.data());
 
-        // 🔹 Send email to each volunteer using EmailJS
-        volunteers.forEach(email => {
-          emailjs.send(
-            'service_2urq71w',
-            'template_pa7cyff',
+        // Send emails
+        for (const volunteer of volunteers) {
+          await emailjs.send(
+            "service_2urq71w",        // ✅ replace with your service ID
+            "template_pa7cyff",       // ✅ replace with your template ID
             {
-              to_email: email,
+              to_email: volunteer.email,
+              to_name: volunteer.name || "Ubuntu Volunteer",
               event_title: newEvent.title,
               event_date: newEvent.date,
               event_location: newEvent.location,
             },
-            "cvMymiNn_bcU1gDbd"
+            "cvMymiNn_bcU1gDbd"       // ✅ replace with your public key
           ).then(
             (result) => {
-              console.log("✅ Email sent to:", email, result.text);
+              console.log(`✅ Email sent to ${volunteer.email}`);
             },
             (error) => {
-              console.error("❌ EmailJS error:", email, error.text);
+              console.error(`❌ Failed to send to ${volunteer.email}:`, error);
             }
           );
-        });
-
+        }
       }
 
       setNewEvent({
