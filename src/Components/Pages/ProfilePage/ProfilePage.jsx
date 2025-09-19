@@ -58,7 +58,7 @@ const ProfilePage = () => {
       )
       .then(() => {
         setStatus('Message sent successfully!');
-        setForm({ name: '', email: '', message: '' });
+        setForm({ name: '', email: '', phone: '', message: '' });
       })
       .catch((error) => {
         console.error('EmailJS error:', error);
