@@ -69,6 +69,7 @@ const EventsPage = () => {
               event_title: newEvent.title,
               event_date: newEvent.date,
               event_location: newEvent.location,
+              event_volunteers: newEvent.volunteers || "N/A"
             },
             "cvMymiNn_bcU1gDbd"       // ✅ replace with your public key
           ).then(
