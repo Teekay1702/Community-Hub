@@ -12,6 +12,7 @@ import './EventCard.css';
 
 const EventCard = ({ event, onEdit, onDelete }) => {
   const navigate = useNavigate();
+
   const getCategoryIcon = (category) => {
     switch (category) {
       case 'soup-kitchen':
@@ -32,14 +33,12 @@ const EventCard = ({ event, onEdit, onDelete }) => {
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    console.log('Delete clicked for event id:', event.id);
     if (window.confirm('Are you sure you want to delete this event?')) {
       onDelete(event.id);
     }
   };
 
   const handleEdit = () => {
-    console.log('Edit triggered for event:', event);
     onEdit(event);
   };
 
@@ -49,26 +48,29 @@ const EventCard = ({ event, onEdit, onDelete }) => {
         {getCategoryIcon(event.category)}
         <h3 className="event-title">{event.title}</h3>
       </div>
+
       <div className="event-detail">
         <MapPin className="detail-icon" />
         <span className="truncate">{event.location}</span>
       </div>
+
       <div className="event-detail">
         <Calendar className="detail-icon" />
         {event.date}
       </div>
+
       <div className="card-footer">
         <div className="volunteer-count">
           <Users className="detail-icon" />
           {event.volunteers}{event.needed} volunteers
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+
+        <div className="footer-buttons">
           <button className="join-button" onClick={handleJoin}>
             Join Ubuntu Spirit
           </button>
           <button
-            className="join-button"
-            style={{ backgroundColor: '#ef4444' }}
+            className="delete-button"
             onClick={handleDelete}
           >
             Delete
@@ -78,6 +80,5 @@ const EventCard = ({ event, onEdit, onDelete }) => {
     </div>
   );
 };
-
 
 export default EventCard;

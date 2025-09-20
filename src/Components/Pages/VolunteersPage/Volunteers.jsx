@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
-import {auth, db} from '../../Data/firebase';
-import {collection, getDocs, setDoc, doc} from 'firebase/firestore';
-import {Link, useLocation} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../../Data/firebase';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { Link, useLocation } from 'react-router-dom';
 import './VolunteersPage.css';
 
-const VolunteersPage = ({events}) => {
+const VolunteersPage = ({ events }) => {
 	const [showForm, setShowForm] = useState(false);
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -29,7 +29,7 @@ const VolunteersPage = ({events}) => {
 	}, []);
 
 	useEffect(() => {
-		const shouldOpen = location.state ?. showForm;
+		const shouldOpen = location.state?.showForm;
 		if (shouldOpen) {
 			setShowForm(true);
 		}
@@ -41,7 +41,7 @@ const VolunteersPage = ({events}) => {
 		try {
 			await createUserWithEmailAndPassword(auth, email, password);
 
-			await setDoc(doc(db, 'volunteers', email), {name, email, createdAt: new Date()});
+			await setDoc(doc(db, 'volunteers', email), { name, email, createdAt: new Date() });
 			setName('');
 			setEmail('');
 			setPassword('');
@@ -66,6 +66,13 @@ const VolunteersPage = ({events}) => {
 		}
 	};
 
+	// Filter upcoming events
+	const today = new Date();
+	const upcomingEvents = events.filter(event => {
+		const eventDate = new Date(event.date);
+		return eventDate >= today;
+	});
+
 	return (
 		<div className="volunteers-page">
 			<h1 className="page-title">Ubuntu Volunteers</h1>
@@ -85,90 +92,75 @@ const VolunteersPage = ({events}) => {
 				<h3 className="section-title">Want to Become a Volunteer?</h3>
 
 				{
-				!showForm ? (
-					<>
-						<button className="btn-join"
-							onClick={
-								() => setShowForm(true)
-						}>
-							Register as a Volunteer
-						</button>
-						<Link to="/profile" className="btn-request-remove">
-							Request to be Removed
-						</Link>
-					</>
-				) : (
-					<div className="volunteer-form">
-						<input type="name" placeholder="Your name" className="input"
-							value={name}
-							onChange={
-								(e) => setName(e.target.value)
-							}/>
-						<input type="email" placeholder="Your email" className="input"
-							value={email}
-							onChange={
-								(e) => setEmail(e.target.value)
-							}/>
-						<input type="password" placeholder="Create a password" className="input"
-							value={password}
-							onChange={
-								(e) => setPassword(e.target.value)
-							}/>
-						<button className="btn-join"
-							onClick={handleVolunteerSignup}>
-							Submit Registration
-						</button>
-						<button className="btn-cancel"
-							onClick={
-								() => setShowForm(false)
-						}>
-							Cancel
-						</button>
-						<Link to="/profile" className="btn-request-remove">
-							Request to be Removed
-						</Link>
-					</div>
-				)
-			}
+					!showForm ? (
+						<>
+							<button className="btn-join"
+								onClick={
+									() => setShowForm(true)
+								}>
+								Register as a Volunteer
+							</button>
+							<Link to="/profile" className="btn-request-remove">
+								Request to be Removed
+							</Link>
+						</>
+					) : (
+						<div className="volunteer-form">
+							<input type="name" placeholder="Your name" className="input"
+								value={name}
+								onChange={
+									(e) => setName(e.target.value)
+								} />
+							<input type="email" placeholder="Your email" className="input"
+								value={email}
+								onChange={
+									(e) => setEmail(e.target.value)
+								} />
+							<input type="password" placeholder="Create a password" className="input"
+								value={password}
+								onChange={
+									(e) => setPassword(e.target.value)
+								} />
+							<button className="btn-join"
+								onClick={handleVolunteerSignup}>
+								Submit Registration
+							</button>
+							<button className="btn-cancel"
+								onClick={
+									() => setShowForm(false)
+								}>
+								Cancel
+							</button>
+							<Link to="/profile" className="btn-request-remove">
+								Request to be Removed
+							</Link>
+						</div>
+					)
+				}
 				{
-				message && (
-					<div className={
-						`fade-message ${messageType}`
-					}>
-						{message} </div>
-				)
-			} </section>
+					message && (
+						<div className={
+							`fade-message ${messageType}`
+						}>
+							{message} </div>
+					)
+				} </section>
 
 			<section className="events-list">
 				<h3 className="section-title">Ways to Show Ubuntu Spirit</h3>
-				{
-				events.map(event => (
-					<div key={
-							event.id
-						}
-						className="event-card card">
-						<h4 className="event-title">
-							{
-							event.title
-						}</h4>
-						<p className="event-meta">
-							{
-							event.location
-						}
-							• {
-							event.date
-						}</p>
-						<div className="event-footer">
-							<span className="volunteer-need">
-								Need {
-								event.needed - event.volunteers
-							}
-								more Ubuntu spirits
-							</span>
+				{upcomingEvents.length > 0 ? (
+					upcomingEvents.map(event => (
+						<div key={event.id} className="event-card card">
+							<h4 className="event-title">{event.title}</h4>
+							<p className="event-meta">
+								{event.location} • {event.date}
+							</p>
 						</div>
-					</div>
-				))
-			} </section>
+					))
+				) : (
+					<p>No upcoming events available.</p>
+				)}
+			</section>
 		</div>
 	);
 };

@@ -30,6 +30,13 @@ const EventsPage = () => {
     loadEvents();
   }, []);
 
+  // Filter upcoming events
+  const today = new Date();
+  const upcomingEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate >= today;
+  });
+
   // Handle create button click
   const handleCreateEvent = async () => {
     try {
@@ -194,15 +201,18 @@ const EventsPage = () => {
         </p>
       )}
       <div className="events-list">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-
-        ))}
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <p>No upcoming events.</p>
+        )}
       </div>
     </div>
   );
