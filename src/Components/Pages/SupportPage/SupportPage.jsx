@@ -120,7 +120,7 @@ const SupportPage = () => {
 					<div className="impact-item">
 						<div className="impact-value orange">
 							{supportCount}</div>
-						<div className="impact-label">Registered Volunteers</div>
+						<div className="impact-label">Registered Supports</div>
 					</div>
 				</div>
 			</section>

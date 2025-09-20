@@ -22,6 +22,14 @@ const HomePage = ({ events, sosRequests, resources }) => {
   const padsCount = resources.filter(r => r.type === 'Pads' && r.status === 'Available' && r.urgency !== 'emergency').length;
   const emergencyPadsCount = resources.filter(r => r.type === 'Pads' && r.urgency === 'emergency').length;
 
+  const today = new Date();
+
+  const upcomingEvents = events
+    .filter(event => new Date(event.date) >= today)  // only future/upcoming events
+    .sort((a, b) => new Date(a.date) - new Date(b.date)) // sort by ascending date
+    .slice(0, 3); // show only the next 3 events
+
+
 
   return (
     <div className="home-page">
@@ -67,14 +75,15 @@ const HomePage = ({ events, sosRequests, resources }) => {
 
       <div className="events-section">
         <h2 className="events-heading">Ubuntu Spirit in Action</h2>
-        {events
-          .slice()
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 3)
-          .map(event => (
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map(event => (
             <EventCard key={event.id} event={event} />
-          ))}
+          ))
+        ) : (
+          <p>No upcoming events.</p>
+        )}
       </div>
+
     </div>
   );
 };

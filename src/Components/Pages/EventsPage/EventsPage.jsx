@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import EventCard from '../../Cards/EventCard/EventCard';
+import LocationInput from './LocationInput';
 import { fetchEvents, addEvent, deleteEvent, updateEvent } from '../../Data/firebaseEvents';
+import emailjs from "emailjs-com";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../Data/firebase";  // ensure db is exported from your firebase.js
 import './Events.css';
 
 const EventsPage = () => {
@@ -26,14 +30,21 @@ const EventsPage = () => {
     loadEvents();
   }, []);
 
+  // Filter upcoming events
+  const today = new Date();
+  const upcomingEvents = events.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate >= today;
+  });
+
   // Handle create button click
   const handleCreateEvent = async () => {
     try {
       if (!newEvent.title || !newEvent.location || !newEvent.date) {
-        setMessage('Please fill in all required fields.');
+        setMessage("Please fill in all required fields.");
         setTimeout(() => {
-          setMessage('');
-          setMessageType('');
+          setMessage("");
+          setMessageType("");
         }, 1000);
         return;
       }
@@ -42,37 +53,66 @@ const EventsPage = () => {
         // Updating an existing event
         const { id, ...eventData } = newEvent;
         await updateEvent(id, eventData);
-        setMessage('Event updated successfully!');
-        setMessageType('success');
+        setMessage("Event updated successfully!");
+        setMessageType("success");
       } else {
         // Creating a new event
         await addEvent(newEvent);
-        setMessage('Event created successfully!');
-        setMessageType('success');
+        setMessage("Event created successfully!");
+        setMessageType("success");
+
+        // Fetch volunteers
+        const snapshot = await getDocs(collection(db, "volunteers"));
+        const volunteers = snapshot.docs.map(doc => doc.data());
+
+        // Send emails
+        for (const volunteer of volunteers) {
+          await emailjs.send(
+            "service_2urq71w",        // ✅ replace with your service ID
+            "template_pa7cyff",       // ✅ replace with your template ID
+            {
+              to_email: volunteer.email,
+              to_name: volunteer.name || "Ubuntu Volunteer",
+              event_title: newEvent.title,
+              event_date: newEvent.date,
+              event_location: newEvent.location,
+              event_volunteers: newEvent.volunteers || "N/A"
+            },
+            "cvMymiNn_bcU1gDbd"       // ✅ replace with your public key
+          ).then(
+            (result) => {
+              console.log(`✅ Email sent to ${volunteer.email}`);
+            },
+            (error) => {
+              console.error(`❌ Failed to send to ${volunteer.email}:`, error);
+            }
+          );
+        }
       }
 
       setNewEvent({
-        title: '',
-        category: '',
-        location: '',
-        date: '',
-        volunteers: ''
+        title: "",
+        category: "",
+        location: "",
+        date: "",
+        volunteers: ""
       });
       setShowNewEvent(false);
 
       const updatedEvents = await fetchEvents();
       setEvents(updatedEvents);
     } catch (error) {
-      console.error('Failed to create/update event:', error);
-      setMessage('Failed to create or update event. Please try again.');
-      setMessageType('error');
+      console.error("Failed to create/update event:", error);
+      setMessage("Failed to create or update event. Please try again.");
+      setMessageType("error");
     }
 
     setTimeout(() => {
-      setMessage('');
-      setMessageType('');
+      setMessage("");
+      setMessageType("");
     }, 2000);
   };
+
 
 
   const handleEdit = (event) => {
@@ -130,6 +170,7 @@ const EventsPage = () => {
               onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
               className="form-input"
             />
+
             <input
               type="date"
               value={newEvent.date}
@@ -160,15 +201,18 @@ const EventsPage = () => {
         </p>
       )}
       <div className="events-list">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-
-        ))}
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <p>No upcoming events.</p>
+        )}
       </div>
     </div>
   );
