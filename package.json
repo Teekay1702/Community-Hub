@@ -13,6 +13,7 @@
     "@capacitor/android": "^7.4.2",
     "@capacitor/cli": "^7.4.2",
     "@capacitor/core": "^7.4.2",
+    "@capacitor/ios": "^7.4.3",
     "@emailjs/browser": "^4.4.1",
     "@react-google-maps/api": "^2.20.7",
     "emailjs-com": "^3.2.0",
