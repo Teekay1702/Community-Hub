@@ -72,7 +72,7 @@ const ProfilePage = () => {
         <div className="profile-avatar">
           <User className="avatar-icon" />
         </div>
-        <h2 className="profile-name">Ubuntu Warrior</h2>
+        <h2 className="profile-name">Tumelo Lekoro</h2>
         <p className="profile-subtext">Spreading Ubuntu since 2025</p>
       </div>
 
