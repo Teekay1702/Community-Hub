@@ -399,6 +399,7 @@
 .btn-help {
   background-color: #28a745;
   color: white;
+  margin-right: 5px;
   padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 6px;
@@ -424,4 +425,90 @@
 
 .btn-close:hover {
   background-color: #c82333;
+}
+
+/* Hotline card mobile responsiveness */
+.hotline-card {
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Website button */
+.btn-website {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  width: fit-content;
+}
+
+.btn-website:hover {
+  background-color: #2563eb; /* blue-600 */
+}
+
+/* Mobile responsiveness for small screens */
+@media (max-width: 480px) {
+  .hotline-card {
+    padding: 0.75rem;
+  }
+
+  .btn-website {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .help-button-row {
+    flex-direction: column;
+  }
+}
+
+/* I'll Help form buttons */
+.btn-submit-volunteer,
+.btn-cancel {
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: none;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.btn-submit-help:hover {
+  background-color: #218838; /* green-600 */
+}
+
+/* Cancel Help button */
+.btn-close {
+  background-color: #dc3545; /* red-600 */
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-cancel-help:hover {
+  background-color: #c82333; /* red-700 */
+}
+
+/* Button container for responsiveness */
+.help-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
 }
