@@ -23,6 +23,7 @@ workflows:
       - name: Build Android
         script: |
           cd android
+          chmod +x gradlew
           ./gradlew clean
           ./gradlew assembleRelease
     artifacts:
@@ -31,4 +32,4 @@ workflows:
     publishing:
       email:
         recipients:
-          - your-email@example.com
+          - tokoloho57@gmail.com
