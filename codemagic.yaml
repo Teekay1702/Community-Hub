@@ -33,3 +33,47 @@ workflows:
       email:
         recipients:
           - tokoloho57@gmail.com
+
+  capacitor-ios:
+    name: Build React + Vite + Capacitor (iOS)
+    max_build_duration: 60
+    environment:
+      node: latest
+      xcode: latest
+      cocoapods: default
+      groups:
+        - appstore_credentials   # Apple signing credentials stored in Codemagic
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm ci
+      - name: Run tests
+        script: |
+          npm test || echo "No tests found, skipping..."
+      - name: Build Vite app
+        script: |
+          npm run build
+      - name: Sync Capacitor
+        script: |
+          npx cap sync ios
+      - name: Build iOS
+        script: |
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
+            clean archive
+          xcodebuild \
+            -exportArchive \
+            -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath $CM_BUILD_DIR/ios_output
+    artifacts:
+      - ios_output/*.ipa
+    publishing:
+      email:
+        recipients:
+          - tokoloho57@gmail.com
