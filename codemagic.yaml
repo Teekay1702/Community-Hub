@@ -1,6 +1,6 @@
 workflows:
   capacitor-app:
-    name: Build React + Vite + Capacitor (Android + iOS)
+    name: Build React + Vite + Capacitor (Android + optional iOS)
     max_build_duration: 90
     environment:
       node: latest
@@ -9,51 +9,56 @@ workflows:
       cocoapods: default
       groups:
         - keystore_credentials     # Android signing
-        - appstore_credentials     # iOS signing
+        # - appstore_credentials   # Uncomment when you add iOS signing
     scripts:
       - name: Install dependencies
-        script: |
-          npm ci
+        script: npm ci
 
       - name: Run tests
-        script: |
-          npm test || echo "No tests found, skipping..."
+        script: npm test || echo "No tests found, skipping..."
 
       - name: Build Vite app
-        script: |
-          npm run build
+        script: npm run build
 
       # --- Android build ---
       - name: Sync Capacitor Android
-        script: |
-          npx cap sync android
+        script: npx cap sync android
+
       - name: Build Android
         script: |
           cd android
           chmod +x gradlew
-          ./gradlew clean
-          ./gradlew assembleRelease
+          ./gradlew clean assembleRelease
 
-      # --- iOS build ---
+      # --- iOS build (only if signing is configured) ---
       - name: Sync Capacitor iOS
         script: |
-          cd $CM_BUILD_DIR
-          npx cap sync ios
+          if [ -n "$APP_STORE_CONNECT_API_KEY" ]; then
+            npx cap sync ios
+          else
+            echo "Skipping iOS sync (no signing credentials)"
+          fi
+
       - name: Build iOS
         script: |
-          cd ios/App
-          xcodebuild \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
-            clean archive
-          xcodebuild \
-            -exportArchive \
-            -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath $CM_BUILD_DIR/ios_output
+          if [ -n "$APP_STORE_CONNECT_API_KEY" ]; then
+            cd ios/App
+            xcodebuild \
+              -workspace App.xcworkspace \
+              -scheme App \
+              -configuration Release \
+              -sdk iphoneos \
+              -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
+              clean archive
+            xcodebuild \
+              -exportArchive \
+              -archivePath $CM_BUILD_DIR/ios_output/App.xcarchive \
+              -exportOptionsPlist ExportOptions.plist \
+              -exportPath $CM_BUILD_DIR/ios_output
+          else
+            echo "Skipping iOS build (no signing credentials)"
+          fi
+
     artifacts:
       - android/app/build/outputs/**/*.apk
       - android/app/build/outputs/**/*.aab
