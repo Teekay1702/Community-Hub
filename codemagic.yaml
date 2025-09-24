@@ -1,23 +1,30 @@
 workflows:
-  capacitor-android:
-    name: Build React + Vite + Capacitor (Android)
-    max_build_duration: 60
+  capacitor-app:
+    name: Build React + Vite + Capacitor (Android + iOS)
+    max_build_duration: 90
     environment:
       node: latest
       java: 21
+      xcode: latest
+      cocoapods: default
       groups:
-        - keystore_credentials   # Android signing credentials stored in Codemagic
+        - keystore_credentials     # Android signing
+        - appstore_credentials     # iOS signing
     scripts:
       - name: Install dependencies
         script: |
           npm ci
+
       - name: Run tests
         script: |
           npm test || echo "No tests found, skipping..."
+
       - name: Build Vite app
         script: |
           npm run build
-      - name: Sync Capacitor
+
+      # --- Android build ---
+      - name: Sync Capacitor Android
         script: |
           npx cap sync android
       - name: Build Android
@@ -26,35 +33,11 @@ workflows:
           chmod +x gradlew
           ./gradlew clean
           ./gradlew assembleRelease
-    artifacts:
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/outputs/**/*.aab
-    publishing:
-      email:
-        recipients:
-          - tokoloho57@gmail.com
 
-  capacitor-ios:
-    name: Build React + Vite + Capacitor (iOS)
-    max_build_duration: 60
-    environment:
-      node: latest
-      xcode: latest
-      cocoapods: default
-      groups:
-        - appstore_credentials   # Apple signing credentials stored in Codemagic
-    scripts:
-      - name: Install dependencies
+      # --- iOS build ---
+      - name: Sync Capacitor iOS
         script: |
-          npm ci
-      - name: Run tests
-        script: |
-          npm test || echo "No tests found, skipping..."
-      - name: Build Vite app
-        script: |
-          npm run build
-      - name: Sync Capacitor
-        script: |
+          cd $CM_BUILD_DIR
           npx cap sync ios
       - name: Build iOS
         script: |
@@ -72,6 +55,8 @@ workflows:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath $CM_BUILD_DIR/ios_output
     artifacts:
+      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/**/*.aab
       - ios_output/*.ipa
     publishing:
       email:
