@@ -3,6 +3,8 @@ import './ProfilePage.css';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../Data/firebase';
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -15,6 +17,8 @@ const ProfilePage = () => {
   });
 
   const [status, setStatus] = useState('');
+
+  const type = location.state?.type || null;
 
   useEffect(() => {
     if (location.state) {
@@ -32,7 +36,7 @@ const ProfilePage = () => {
     setStatus('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const templateParams = {
@@ -45,25 +49,33 @@ const ProfilePage = () => {
 
     setStatus('Sending...');
 
-    console.log('templateParams being sent to EmailJS:', templateParams);
-
-    console.log('Submitting form:', form);
-
-    emailjs
-      .send(
-        'service_2urq71w',       // Your EmailJS service ID
-        'template_tkzitdh',      // Your EmailJS template ID
+    try {
+      // Send Email
+      await emailjs.send(
+        'service_2urq71w',
+        'template_tkzitdh',
         templateParams,
-        'cvMymiNn_bcU1gDbd'      // Your EmailJS public key
-      )
-      .then(() => {
-        setStatus('Message sent successfully!');
-        setForm({ name: '', email: '', phone: '', message: '' });
-      })
-      .catch((error) => {
-        console.error('EmailJS error:', error);
-        setStatus('Failed to send message. Please try again.');
-      });
+        'cvMymiNn_bcU1gDbd'
+      );
+
+      // Only save to Firestore if this is a support request
+      if (type === 'supportRequest') {
+        await addDoc(collection(db, 'supportRequests'), {
+          name: form.name,
+          email: form.email,
+          text: form.message,
+          timestamp: serverTimestamp(),
+          status: 'submitted',
+          responders: [],
+        });
+      }
+
+      setStatus('Message sent successfully!');
+      setForm({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      console.error('EmailJS error:', error);
+      setStatus('Failed to send message. Please try again.');
+    }
   };
 
   return (
@@ -111,7 +123,9 @@ const ProfilePage = () => {
               onChange={handleChange}
               required
             />
-            <button type="submit" className="btn-submit">Send Message</button>
+            <button type="submit" className="btn-submit">
+              Send Message
+            </button>
             {status && <p className="form-status">{status}</p>}
           </form>
         </section>
