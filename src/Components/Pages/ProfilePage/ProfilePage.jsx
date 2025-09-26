@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../Data/firebase';
+import PrivacyPolicy from './PrivacyPolicy';
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const ProfilePage = () => {
   });
 
   const [status, setStatus] = useState('');
+  const [showPolicy, setShowPolicy] = useState(false);
 
   const type = location.state?.type || null;
 
@@ -129,7 +131,31 @@ const ProfilePage = () => {
             {status && <p className="form-status">{status}</p>}
           </form>
         </section>
+        {/* ✅ Privacy Policy link */}
+        <section className="privacy-section card">
+          <button
+            className="btn-privacy"
+            onClick={() => setShowPolicy(true)}
+          >
+            View Privacy Policy
+          </button>
+        </section>
       </div>
+
+      {/* ✅ Modal */}
+      {showPolicy && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button
+              className="modal-close"
+              onClick={() => setShowPolicy(false)}
+            >
+              ✖
+            </button>
+            <PrivacyPolicy />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
