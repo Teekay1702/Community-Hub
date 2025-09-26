@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.tokoloho.communityhub"
+    namespace "com.tokoloho.uBuntuITAV"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.tokoloho.communityhub"
