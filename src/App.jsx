@@ -7,6 +7,7 @@ import ResourcesPage from './Components/Pages/ResourcesPage/ResourcesPage'
 import SupportPage from './Components/Pages/SupportPage/SupportPage'
 import VolunteersPage from './Components/Pages/VolunteersPage/Volunteers'
 import ProfilePage from './Components/Pages/ProfilePage/ProfilePage'
+import PrivacyPolicy from './Components/Pages/ProfilePage/PrivacyPolicy'
 import { addEvent, updateEvent } from './Components/Data/firebaseEvents'
 import { addSOSRequest } from './Components/Data/firebaseSOS'
 import { collection, onSnapshot } from 'firebase/firestore'
@@ -120,6 +121,7 @@ const App = () => {
           <Route path="/support" element={<SupportPage />} />
           <Route path="/volunteers" element={<VolunteersPage events={events} />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/home" />} />
