@@ -1,7 +1,6 @@
 .profile-page {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
   }
   
   .profile-card {
@@ -98,7 +97,7 @@
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  width: 100%;
+  width: 90%;
 }
 
 .contact-form textarea {
@@ -114,6 +113,7 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  width: 94%;
 }
 
 .btn-submit:hover {
